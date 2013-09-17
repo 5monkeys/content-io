@@ -1,0 +1,2 @@
+class UnknownPlugin(Exception):
+    pass
