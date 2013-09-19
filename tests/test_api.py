@@ -89,10 +89,18 @@ def test_revisions():
 
     assert len(set(cio.revisions('i18n://sv-se@page/title'))) == 0
 
+    node = cio.load('sv-se@page/title')
+    assert node == {
+        'uri': 'i18n://sv-se@page/title.txt',
+        'data': None,
+        'content': None,
+        'meta': {}
+    }
+
     # First draft
     with assert_db(selects=1, inserts=1, updates=0):
         with assert_cache(calls=0):
-            node = cio.set('i18n://sv-se@page/title.txt', u'Djedi', publish=False)
+            node = cio.set('i18n://sv-se@page/title.txt', u'Content-IO', publish=False)
             assert node.uri == 'i18n://sv-se@page/title.txt#draft'
 
     assertRevisions(('i18n://sv-se@page/title.txt#draft', False))
@@ -105,16 +113,16 @@ def test_revisions():
             assert node.uri == 'i18n://sv-se@page/title.txt#1'
 
     assertRevisions(('i18n://sv-se@page/title.txt#1', True))
-    assert cio.get('page/title').content == u'Djedi'
+    assert cio.get('page/title').content == u'Content-IO'
 
     # Second draft
     with assert_db(selects=1, inserts=1, updates=0):
         with assert_cache(calls=0):
-            node = cio.set('i18n://sv-se@page/title.md', u'# Djedi - Fast!', publish=False)
+            node = cio.set('i18n://sv-se@page/title.md', u'# Content-IO - Fast!', publish=False)
             assert node.uri == 'i18n://sv-se@page/title.md#draft'
 
     assertRevisions(('i18n://sv-se@page/title.txt#1', True), ('i18n://sv-se@page/title.md#draft', False))
-    assert cio.get('page/title').content == u'Djedi'
+    assert cio.get('page/title').content == u'Content-IO'
 
     # Publish second draft, version 2
     with assert_db(calls=4, selects=2, updates=2):
@@ -123,16 +131,16 @@ def test_revisions():
             assert node.uri == 'i18n://sv-se@page/title.md#2'
 
     assertRevisions(('i18n://sv-se@page/title.txt#1', False), ('i18n://sv-se@page/title.md#2', True))
-    assert cio.get('page/title').content == u'<h1>Djedi - Fast!</h1>'
+    assert cio.get('page/title').content == u'<h1>Content-IO - Fast!</h1>'
 
     # Alter published version 2
     with assert_db(calls=2, selects=1, inserts=0, updates=1):
         with assert_cache(calls=0):
-            node = cio.set('i18n://sv-se@page/title.md#2', u'# Djedi - Lightening fast!', publish=False)
+            node = cio.set('i18n://sv-se@page/title.md#2', u'# Content-IO - Lightening fast!', publish=False)
             assert node.uri == 'i18n://sv-se@page/title.md#2'
 
     assertRevisions(('i18n://sv-se@page/title.txt#1', False), ('i18n://sv-se@page/title.md#2', True))
-    assert cio.get('page/title').content == u'<h1>Djedi - Fast!</h1>'  # Not published, still in cache
+    assert cio.get('page/title').content == u'<h1>Content-IO - Fast!</h1>'  # Not published, still in cache
 
     # Re-publish version 2, no change
     with assert_db(selects=1, inserts=0, updates=0):
@@ -141,7 +149,7 @@ def test_revisions():
             assert node.uri == 'i18n://sv-se@page/title.md#2'
 
     assertRevisions(('i18n://sv-se@page/title.txt#1', False), ('i18n://sv-se@page/title.md#2', True))
-    assert cio.get('page/title').content == u'<h1>Djedi - Lightening fast!</h1>'
+    assert cio.get('page/title').content == u'<h1>Content-IO - Lightening fast!</h1>'
 
     # Rollback version 1
     with assert_db(calls=3, selects=1, updates=2):
@@ -150,27 +158,27 @@ def test_revisions():
             assert node.uri == 'i18n://sv-se@page/title.txt#1'
 
     assertRevisions(('i18n://sv-se@page/title.txt#1', True), ('i18n://sv-se@page/title.md#2', False))
-    assert cio.get('page/title').content == u'Djedi'
+    assert cio.get('page/title').content == u'Content-IO'
 
     # Assert get specific version doesn't mess up the cache
     cache.clear()
     with assert_cache(calls=0):
-        assert cio.get('page/title#2').content == u'<h1>Djedi - Lightening fast!</h1>'
+        assert cio.get('page/title#2').content == u'<h1>Content-IO - Lightening fast!</h1>'
     with assert_cache(calls=2, misses=1, sets=1):
-        assert cio.get('page/title').content == u'Djedi'
+        assert cio.get('page/title').content == u'Content-IO'
 
     # Load version 1 and 2
     data = cio.load('sv-se@page/title#1')
     assert data['uri'] == 'i18n://sv-se@page/title.txt#1'
-    assert data['data'] == u'Djedi'
+    assert data['data'] == u'Content-IO'
     data = cio.load('sv-se@page/title#2')
     assert data['uri'] == 'i18n://sv-se@page/title.md#2'
-    assert data['data'] == u'# Djedi - Lightening fast!'
+    assert data['data'] == u'# Content-IO - Lightening fast!'
 
     # Load without version and expect published version
     data = cio.load('sv-se@page/title')
     assert data['uri'] == 'i18n://sv-se@page/title.txt#1'
-    assert data['data'] == u'Djedi'
+    assert data['data'] == u'Content-IO'
 
 
 def test_environment_state():

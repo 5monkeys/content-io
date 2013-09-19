@@ -26,7 +26,6 @@ def test_register_plugin():
         plugins.register('cio.plugins.text.BogusPlugin')
 
 
-# @pytest.mark.django_db(transaction=True)
 def test_plugin():
     plugins.register(UppercasePlugin)
 
@@ -43,6 +42,8 @@ def test_plugin():
     assert node.content == u'LUNDBERG'
     assert node.uri.ext == 'up'
 
+    assert set(p for p in plugins) == set(('txt', 'md', 'up'))
+
 
 class UppercasePlugin(BasePlugin):
 
@@ -50,11 +51,9 @@ class UppercasePlugin(BasePlugin):
 
     def load(self, content):
         return json.loads(content)
-        # return content.rstrip('.saved')
 
     def save(self, data):
         return json.dumps(data)
-        # return data + '.saved'
 
     def render(self, data):
         return data['name'].upper()

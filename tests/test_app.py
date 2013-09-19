@@ -45,7 +45,6 @@ def test_environment():
         cio.env.__init__()
 
 
-# @pytest.mark.django_db(transaction=True)
 def test_context():
     assert cio.env.state.i18n == ('sv-se',)
 

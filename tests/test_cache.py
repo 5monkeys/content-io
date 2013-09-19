@@ -8,7 +8,6 @@ from .asserts import assert_cache
 uri = 'i18n://sv-se@label/email.txt'
 
 
-# @pytest.mark.django_db(transaction=True)
 def test_cached_node():
     with pytest.raises(NodeDoesNotExist):
         storage.get(uri)
@@ -38,7 +37,6 @@ def test_cached_node():
     assert content is None
 
 
-# @pytest.mark.django_db(transaction=True)
 def test_cache_encoding():
     cio.set(uri, u'epost')
 
@@ -52,7 +50,6 @@ def test_cache_encoding():
     assert nodes == {uri: {'uri': 'i18n://sv-se@label/email.txt#1', 'content': u'epost'}}
 
 
-# @pytest.mark.django_db(transaction=True)
 def test_cache_delete():
     uris = ['i18n://sv-se@foo.txt', 'i18n://sv-se@bar.txt']
 
