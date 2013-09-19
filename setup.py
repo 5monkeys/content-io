@@ -24,7 +24,7 @@ version = __import__('cio').__version__
 setup(
     name='content-io',
     version=version,
-    description='',
+    description='Send content through a highly configurable pipeline including cache, plugin and storage pipes',
     long_description=codecs.open(
         os.path.join(
             os.path.dirname(__file__),

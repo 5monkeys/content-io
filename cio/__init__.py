@@ -1,7 +1,7 @@
 # coding=utf-8
 import sys
 
-VERSION = (1, 0, 0, 'beta', 1)
+VERSION = (1, 0, 0, 'beta', 2)
 
 
 def get_version(version=None):
