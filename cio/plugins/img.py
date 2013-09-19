@@ -46,9 +46,9 @@ class ImagePlugin(BasePlugin):
         width = int(data.get('width') or 0)
         height = int(data.get('height') or 0)
 
-        upload = data['file']
-        filename = data['filename']
-        file = image = None
+        file = None
+        upload = data.get('file')
+        filename = data.get('filename')
 
         if upload:
             image = Image.open(upload)
@@ -58,16 +58,21 @@ class ImagePlugin(BasePlugin):
         elif filename:
             file = self._open(filename)
             image = Image.open(file)
+        else:
+            raise KeyError('ImagePlugin requires file or filename data')
 
         if image:
+            # Remember original image format before processing
+            format = image.format
+
             # Crop
             crop = data.get('crop')
             if crop:
                 try:
                     box = tuple(int(x) for x in crop.split(','))
                     image = image.crop(box)
-                except Exception as e:
-                    print e
+                except:
+                    pass  # TODO: Handle image crop error
                 else:
                     filename = self._create_filename(filename, crop=crop)
 
@@ -76,21 +81,19 @@ class ImagePlugin(BasePlugin):
             if (width and width != i_width) or (height and height != i_height):
                 try:
                     image = image.resize((width, height), Image.ANTIALIAS)
+                except:
                     pass
-                except Exception as e:
-                    print e
                 else:
                     filename = self._create_filename(filename, w=width, h=height)
             else:
                 width = i_width
                 height = i_height
 
-            if filename != data['filename']:
-                # new_file = self._open(filename, 'w')
+            # Write file
+            if filename != data.get('filename'):
                 new_file = StringIO.StringIO()
-                image.save(new_file, image.format)
+                image.save(new_file, format)
                 filename = self._save(filename, new_file)
-                # new_file.close()
 
         if file:
             file.close()
@@ -99,9 +102,9 @@ class ImagePlugin(BasePlugin):
             'filename': filename,
             'width': width,
             'height': height,
-            'id': data['id'] or None,
-            'class': data['class'] or None,
-            'alt': data['alt'] or None
+            'id': data.get('id') or None,
+            'class': data.get('class') or None,
+            'alt': data.get('alt') or None
         }
 
         return json.dumps(content)
