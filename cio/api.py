@@ -116,11 +116,12 @@ def load(uri):
         # Initialize non-existing node without version
         uri = uri.clone(version=None)
 
-        # Set default extension or validate given
+        # Set default extension
         if not uri.ext:
             uri = uri.clone(ext=settings.URI_DEFAULT_EXT)
-        else:
-            plugins.resolve(uri)
+
+        # Validate plugin existence
+        plugins.resolve(uri)
 
         node = {
             'uri': uri,
