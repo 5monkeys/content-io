@@ -12,3 +12,6 @@ develop:
 
 coverage:
 	coverage run --include=cio/* setup.py test
+
+clean:
+	rm -rf .tox/ dist/ *.egg *.egg-info .coverage
