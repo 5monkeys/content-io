@@ -16,7 +16,7 @@ def get_backend(backend):
 
     # Unpack backend dict format
     if isinstance(backend, dict):
-        _backend = backend.pop('BACKEND')
+        _backend = backend.get('BACKEND')
         config.update(backend)
         backend = _backend
 
@@ -54,27 +54,36 @@ class BackendManager(object):
     """
     Manager for backend. Handles arg validation.
     """
-    def __init__(self, path):
-        self._path = path
+    def __init__(self):
+        self._config = None
         self._backend = None
 
     @property
     def backend(self):
-        # TODO: Extend BaseStorage
-        # TODO: Handle backend switch in settings?
+        # Check if backend is configured and/or switched
+        backend_config = self._get_backend_config()
+
+        if not self._config or id(self._config) != id(backend_config):
+            self._config = backend_config
+            self._backend = None
+
+        # Find and instantiate backend
         if not self._backend:
-            backend = get_backend(self._path)
+            backend = get_backend(self._config)
 
             # Validate backend
             if self._is_valid_backend(backend):
                 self._backend = backend
             else:
-                raise InvalidBackend('Invalid content-io %s backend "%s"' % (self._scope(), self._path))
+                raise InvalidBackend('Invalid content-io %s backend "%s"' % (self._scope(), self._conf))
 
         return self._backend
 
     def _scope(self):
         return self.__class__.__name__.rstrip('Manager').lower()
+
+    def _get_backend_config(self):
+        raise NotImplementedError
 
     def _is_valid_backend(self, backend):
         raise NotImplementedError
@@ -105,6 +114,9 @@ class BackendManager(object):
 
 
 class CacheManager(BackendManager, CacheBackend):
+
+    def _get_backend_config(self):
+        return settings.CACHE
 
     def get(self, uri):
         uri = self._clean_get_uri(uri)
@@ -147,6 +159,9 @@ class CacheManager(BackendManager, CacheBackend):
 
 
 class StorageManager(BackendManager, StorageBackend):
+
+    def _get_backend_config(self):
+        return settings.STORAGE
 
     def get(self, uri):
         uri = self._clean_get_uri(uri)
@@ -196,13 +211,5 @@ class StorageManager(BackendManager, StorageBackend):
         return self._clean_uri(uri, 'namespace', 'path', 'version')
 
 
-def get_cache(backend):
-    return CacheManager(backend)
-
-
-def get_storage(backend):
-    return StorageManager(backend)
-
-
-cache = get_cache(settings.CACHE)
-storage = get_storage(settings.STORAGE)
+cache = CacheManager()
+storage = StorageManager()
