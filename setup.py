@@ -1,23 +1,14 @@
 #!/usr/bin/env python
 import codecs
 import os
-import sys
 from setuptools import setup, find_packages
-from setuptools.command.test import test as TestCommand
 
 
-class PyTest(TestCommand):
-
-    def finalize_options(self):
-        TestCommand.finalize_options(self)
-        self.test_args = []
-        self.test_suite = True
-
-    def run_tests(self):
-        import pytest
-        errno = pytest.main(self.test_args)
-        sys.exit(errno)
-
+tests_require = [
+    'unittest2',
+    'coverage',
+    'Markdown'
+]
 
 version = __import__('cio').__version__
 
@@ -51,7 +42,9 @@ setup(
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
-    tests_require=['pytest', 'markdown'],
-    test_suite='tests',
-    cmdclass={'test': PyTest},
+    extras_require={
+        'tests': tests_require,
+    },
+    tests_require=tests_require,
+    test_suite='runtests.main',
 )

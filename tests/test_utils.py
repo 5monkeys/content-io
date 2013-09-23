@@ -1,31 +1,34 @@
 from cio.utils.uri import URI
+from tests import BaseTest
 
 
-def test_uri():
-    assert URI('i18n://sv@page/title.txt') == 'i18n://sv@page/title.txt'
+class UtilsTest(BaseTest):
 
-    uri = URI(scheme='i18n', namespace='sv-se', path='page/title', ext='txt')
-    assert uri == 'i18n://sv-se@page/title.txt'
+    def test_uri(self):
+        self.assertEqual(URI('i18n://sv@page/title.txt'), 'i18n://sv@page/title.txt')
 
-    uri = URI('page/title')
-    assert not uri.is_absolute()
-    assert uri.scheme == 'i18n'
-    assert uri.namespace is None
-    assert uri.path == 'page/title'
-    assert uri.ext is None
+        uri = URI(scheme='i18n', namespace='sv-se', path='page/title', ext='txt')
+        self.assertEqual(uri, 'i18n://sv-se@page/title.txt')
 
-    uri = uri.clone(namespace='sv-se')
-    assert not uri.is_absolute()
-    assert uri == 'i18n://sv-se@page/title'
+        uri = URI('page/title')
+        self.assertFalse(uri.is_absolute())
+        self.assertEqual(uri.scheme, 'i18n')
+        self.assertIsNone(uri.namespace)
+        self.assertEqual(uri.path, 'page/title')
+        self.assertIsNone(uri.ext)
 
-    uri = uri.clone(ext='txt')
-    assert uri == 'i18n://sv-se@page/title.txt'
-    assert uri.is_absolute()
+        uri = uri.clone(namespace='sv-se')
+        self.assertFalse(uri.is_absolute())
+        self.assertEqual(uri, 'i18n://sv-se@page/title')
 
-    uri = URI('page/title')
-    uri = uri.clone(scheme=None)
-    assert uri == 'page/title'
+        uri = uri.clone(ext='txt')
+        self.assertEqual(uri, 'i18n://sv-se@page/title.txt')
+        self.assertTrue(uri.is_absolute())
 
-    uri = URI('i18n://sv@page/title.txt#draft')
-    assert uri == 'i18n://sv@page/title.txt#draft'
-    assert uri.version == 'draft'
+        uri = URI('page/title')
+        uri = uri.clone(scheme=None)
+        self.assertEqual(uri, 'page/title')
+
+        uri = URI('i18n://sv@page/title.txt#draft')
+        self.assertEqual(uri, 'i18n://sv@page/title.txt#draft')
+        self.assertEqual(uri.version, 'draft')

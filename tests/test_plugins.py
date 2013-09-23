@@ -1,48 +1,48 @@
 import json
-import pytest
 import cio
 from cio.plugins import plugins
 from cio.backends import storage
 from cio.plugins.base import BasePlugin
 from cio.plugins.exceptions import UnknownPlugin
 from cio.plugins.txt import TextPlugin
+from tests import BaseTest
 
 
-def test_resolve_plugin():
-    with pytest.raises(UnknownPlugin):
-        plugins.get('xyz')
+class PluginTest(BaseTest):
 
-    plugin = plugins.resolve('i18n://sv-se@page/title.txt')
-    assert isinstance(plugin, TextPlugin)
+    def test_resolve_plugin(self):
+        with self.assertRaises(UnknownPlugin):
+            plugins.get('xyz')
 
-    with pytest.raises(UnknownPlugin):
-        plugins.resolve('i18n://sv-se@page/title.foo')
+        plugin = plugins.resolve('i18n://sv-se@page/title.txt')
+        self.assertIsInstance(plugin, TextPlugin)
 
+        with self.assertRaises(UnknownPlugin):
+            plugins.resolve('i18n://sv-se@page/title.foo')
 
-def test_register_plugin():
-    with pytest.raises(ImportError):
-        plugins.register('foo.bar.BogusPlugin')
-    with pytest.raises(ImportError):
-        plugins.register('cio.plugins.text.BogusPlugin')
+    def test_register_plugin(self):
+        with self.assertRaises(ImportError):
+            plugins.register('foo.bar.BogusPlugin')
+        with self.assertRaises(ImportError):
+            plugins.register('cio.plugins.text.BogusPlugin')
 
+    def test_plugin(self):
+        plugins.register(UppercasePlugin)
 
-def test_plugin():
-    plugins.register(UppercasePlugin)
+        node = cio.set('sv-se@page/title.up', {'name': u'lundberg'}, publish=False)
+        self.assertListEqual(node._content, [{'name': u'lundberg'}, u'{"name": "lundberg"}', u'LUNDBERG'])
 
-    node = cio.set('sv-se@page/title.up', {'name': u'lundberg'}, publish=False)
-    assert node._content == [{'name': u'lundberg'}, u'{"name": "lundberg"}', u'LUNDBERG']
+        cio.publish(node.uri)
 
-    cio.publish(node.uri)
+        node = cio.get('page/title.up')
+        raw_content = storage.get(node.uri)
 
-    node = cio.get('page/title.up')
-    raw_content = storage.get(node.uri)
+        self.assertEqual(raw_content['uri'], 'i18n://sv-se@page/title.up#1')
+        self.assertEqual(raw_content['content'], u'{"name": "lundberg"}')
+        self.assertEqual(node.content, u'LUNDBERG')
+        self.assertEqual(node.uri.ext, 'up')
 
-    assert raw_content['uri'] == 'i18n://sv-se@page/title.up#1'
-    assert raw_content['content'] == u'{"name": "lundberg"}'
-    assert node.content == u'LUNDBERG'
-    assert node.uri.ext == 'up'
-
-    assert set(p for p in plugins) == set(('txt', 'md', 'up'))
+        self.assertSetEqual(set(p for p in plugins), set(('txt', 'md', 'up')))
 
 
 class UppercasePlugin(BasePlugin):
