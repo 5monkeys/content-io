@@ -29,6 +29,8 @@ setup(
     keywords=['cms', 'content', 'management', 'pipeline', 'plugin', 'backend', 'cache', 'storage'],
     license='BSD',
     packages=find_packages(exclude='tests'),
+    include_package_data=False,
+    zip_safe=False,
     classifiers=[
         'Environment :: Web Environment',
         'Natural Language :: English',
