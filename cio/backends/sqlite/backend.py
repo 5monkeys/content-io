@@ -14,7 +14,9 @@ class SqliteBackend(DatabaseBackend):
         self.queries = []
         if 'NAME' not in self.config:
             raise ImproperlyConfigured('Missing sqlite database name.')
-        self._connection = sqlite3.connect(self.config['NAME'])
+        database = self.config['NAME']
+        kwargs = self.config.get('OPTIONS', {})
+        self._connection = sqlite3.connect(database, **kwargs)
         self._setup()
 
     def _setup(self):
