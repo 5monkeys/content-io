@@ -34,9 +34,10 @@ class PluginTest(BaseTest):
 
         cio.publish(node.uri)
 
-        node = cio.get('page/title.up')
+        node = cio.get('page/title')
         raw_content = storage.get(node.uri)
 
+        self.assertIsNotNone(raw_content)
         self.assertEqual(raw_content['uri'], 'i18n://sv-se@page/title.up#1')
         self.assertEqual(raw_content['content'], u'{"name": "lundberg"}')
         self.assertEqual(node.content, u'LUNDBERG')
@@ -50,7 +51,7 @@ class UppercasePlugin(BasePlugin):
     ext = 'up'
 
     def load(self, content):
-        return json.loads(content)
+        return json.loads(content) if content else None
 
     def save(self, data):
         return json.dumps(data)

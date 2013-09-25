@@ -104,14 +104,11 @@ class SqliteBackend(DatabaseBackend):
         if uri.ext:
             statements.append('plugin=:plugin')
             params['plugin'] = uri.ext
-            # nodes = nodes.filter(plugin=uri.ext)
         if uri.version:
             statements.append('version=:version')
             params['version'] = uri.version
-            # nodes = nodes.filter(version=uri.version)
         else:
             statements.append('is_published=1')
-            # nodes = nodes.filter(is_published=True)
 
         query += ' AND '.join(statements)
         result = self._call_select(query, **params)
