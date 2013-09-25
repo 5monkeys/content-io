@@ -1,6 +1,13 @@
+from cio.conf import settings
+
+
 class BasePlugin(object):
 
     ext = None
+
+    @property
+    def settings(self):
+        return settings.get(self.ext.upper(), {})
 
     def load(self, content):
         """
