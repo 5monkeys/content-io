@@ -7,10 +7,16 @@ from ..utils.uri import URI
 class PluginLibrary(object):
 
     def __init__(self):
-        self.load()
+        self._plugins = {}
 
     def __iter__(self):
-        return self._plugins.iterkeys()
+        return self.plugins.iterkeys()
+
+    @property
+    def plugins(self):
+        if not self._plugins:
+            self.load()
+        return self._plugins
 
     def load(self):
         self._plugins = {}
@@ -28,9 +34,9 @@ class PluginLibrary(object):
             self._plugins[plugin.ext] = plugin()
 
     def get(self, ext):
-        if not ext in self._plugins:
+        if not ext in self.plugins:
             raise UnknownPlugin
-        return self._plugins[ext]
+        return self.plugins[ext]
 
     def resolve(self, uri):
         uri = URI(uri)
