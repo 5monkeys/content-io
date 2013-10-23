@@ -13,10 +13,10 @@ class PipelineHandler(object):
     def __init__(self):
         self.history = NodeHistory()
         self._buffer = NodeBuffer()
-        self.pipes = []
         self.load()
 
     def load(self):
+        self.pipes = []
         for pipe_path in settings.PIPELINE:
             self.add_pipe(pipe_path)
         self.build()
