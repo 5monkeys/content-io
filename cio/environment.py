@@ -12,6 +12,7 @@ class Environment(ThreadLocalObject):
     def __init__(self):
         super(Environment, self).__init__()
         self.reset()
+        settings.watch(self.reset)
 
     @contextmanager
     def __call__(self, name=None, i18n=None, l10n=None, g11n=None):

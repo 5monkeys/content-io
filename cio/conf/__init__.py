@@ -1,11 +1,15 @@
-from . import default_settings
+import logging
 from contextlib import contextmanager
 from types import ModuleType
+from . import default_settings
+
+logger = logging.getLogger(__name__)
 
 
 class Settings(dict):
 
     def __init__(self, conf=None, **settings):
+        self._listeners = set()
         self.configure(conf=conf, **settings)
 
     @contextmanager
@@ -33,6 +37,15 @@ class Settings(dict):
         for setting, value in (conf or settings).iteritems():
             if setting.isupper():
                 self[setting] = value
+
+        for callback in self._listeners:
+            try:
+                callback()
+            except Exception as e:
+                logger.warn('Failed to notify callback about new settings; %s', e)
+
+    def watch(self, callback):
+        self._listeners.add(callback)
 
     __getattr__ = dict.__getitem__
     __setattr__ = dict.__setitem__

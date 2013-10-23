@@ -14,6 +14,7 @@ class PipelineHandler(object):
         self.history = NodeHistory()
         self._buffer = NodeBuffer()
         self.load()
+        settings.watch(self.load)
 
     def load(self):
         self.pipes = []

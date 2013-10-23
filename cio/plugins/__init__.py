@@ -8,6 +8,7 @@ class PluginLibrary(object):
 
     def __init__(self):
         self._plugins = {}
+        settings.watch(self.load)
 
     def __iter__(self):
         return self.plugins.iterkeys()

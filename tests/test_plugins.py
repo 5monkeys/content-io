@@ -1,5 +1,6 @@
 import json
 import cio
+from cio.conf import settings
 from cio.plugins import plugins
 from cio.backends import storage
 from cio.plugins.base import BasePlugin
@@ -27,7 +28,15 @@ class PluginTest(BaseTest):
             plugins.register('cio.plugins.text.BogusPlugin')
 
     def test_plugin(self):
-        plugins.register(UppercasePlugin)
+        self.assertSetEqual(set(plugins.plugins.keys()), set(['txt', 'md']))
+
+        settings.configure(PLUGINS=[
+            'cio.plugins.txt.TextPlugin',
+            'cio.plugins.md.MarkdownPlugin',
+            'tests.test_plugins.UppercasePlugin'
+        ])
+
+        self.assertSetEqual(set(plugins.plugins.keys()), set(['txt', 'md', 'up']))
 
         node = cio.set('sv-se@page/title.up', {'name': u'lundberg'}, publish=False)
         self.assertListEqual(node._content, [{'name': u'lundberg'}, u'{"name": "lundberg"}', u'LUNDBERG'])

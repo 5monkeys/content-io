@@ -55,29 +55,26 @@ class BackendManager(object):
     Manager for backend. Handles arg validation.
     """
     def __init__(self):
-        self._config = None
         self._backend = None
+        settings.watch(self.setup)
 
     @property
     def backend(self):
-        # Check if backend is configured and/or switched
-        backend_config = self._get_backend_config()
-
-        if not self._config or id(self._config) != id(backend_config):
-            self._config = backend_config
-            self._backend = None
-
-        # Find and instantiate backend
         if not self._backend:
-            backend = get_backend(self._config)
-
-            # Validate backend
-            if self._is_valid_backend(backend):
-                self._backend = backend
-            else:
-                raise InvalidBackend('Invalid content-io %s backend "%s"' % (self._scope(), self._conf))
+            self.setup()
 
         return self._backend
+
+    def setup(self):
+        # Find and instantiate backend
+        config = self._get_backend_config()
+        backend = get_backend(config)
+
+        # Validate backend
+        if self._is_valid_backend(backend):
+            self._backend = backend
+        else:
+            raise InvalidBackend('Invalid content-io %s backend "%s"' % (self._scope(), self._conf))
 
     def _scope(self):
         return self.__class__.__name__.rstrip('Manager').lower()
