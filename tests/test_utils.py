@@ -1,3 +1,4 @@
+# coding=utf-8
 from cio.utils.uri import URI
 from tests import BaseTest
 
@@ -24,6 +25,16 @@ class UtilsTest(BaseTest):
         uri = uri.clone(ext='txt')
         self.assertEqual(uri, 'i18n://sv-se@page/title.txt')
         self.assertTrue(uri.is_absolute())
+
+        uri = uri.clone(path='images/me.jpg/title', version='draft')
+        self.assertEqual(uri, 'i18n://sv-se@images/me.jpg/title.txt#draft')
+        self.assertEqual(uri.version, 'draft')
+        self.assertEqual(uri.path, 'images/me.jpg/title')
+        self.assertEqual(uri.ext, 'txt')
+
+        uri = uri.clone(ext=None)
+        self.assertEqual(uri, 'i18n://sv-se@images/me.jpg/title#draft')
+        self.assertIsNone(uri.ext)
 
         uri = URI('page/title')
         uri = uri.clone(scheme=None)
