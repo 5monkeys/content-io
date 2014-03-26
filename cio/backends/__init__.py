@@ -26,7 +26,7 @@ def get_backend(backend):
         # Parse uri or package
         if '://' in backend:
             scheme, _config = backend.split('://', 1)
-            if not scheme in BACKENDS:
+            if scheme not in BACKENDS:
                 raise InvalidBackend('Invalid content-io backend scheme "%s"' % scheme)
             package = backend = 'cio.backends.%s' % BACKENDS[scheme]
             class_name = 'Backend'

@@ -35,7 +35,7 @@ class PluginLibrary(object):
             self._plugins[plugin.ext] = plugin()
 
     def get(self, ext):
-        if not ext in self.plugins:
+        if ext not in self.plugins:
             raise UnknownPlugin
         return self.plugins[ext]
 

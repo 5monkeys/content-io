@@ -55,7 +55,7 @@ class NodeBuffer(ThreadLocalObject):
         return sum(len(method_nodes) for method_nodes in self._buffer.values())
 
     def add(self, method, node):
-        if not method in self._buffer:
+        if method not in self._buffer:
             self._buffer[method] = defaultdict(list)
 
         buffer = self._buffer[method]
