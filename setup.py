@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-import codecs
-import os
 from setuptools import setup, find_packages
 
 
@@ -16,12 +14,12 @@ setup(
     name='content-io',
     version=version,
     description='Send content through a highly configurable pipeline including cache, plugin and storage pipes',
-    long_description=codecs.open(
-        os.path.join(
-            os.path.dirname(__file__),
-            'README.md'
-        )
-    ).read(),
+    long_description=(
+        '.. image:: https://travis-ci.org/5monkeys/content-io.png?branch=master\n'
+        '    :target: https://travis-ci.org/5monkeys/content-io\n'
+        '.. image:: https://coveralls.io/repos/5monkeys/content-io/badge.png?branch=master\n'
+        '    :target: https://coveralls.io/r/5monkeys/content-io?branch=master\n\n'
+    ),
     author='Jonas Lundberg',
     author_email='jonas@5monkeys.se',
     url='https://github.com/5monkeys/content-io',
