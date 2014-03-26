@@ -1,3 +1,4 @@
+# coding=utf-8
 from ..conf import settings
 
 
@@ -17,7 +18,14 @@ class URI(str):
         base, _, version = uri.partition(settings.URI_VERSION_SEPARATOR)
         scheme, _, path = base.rpartition(settings.URI_SCHEME_SEPARATOR)
         namespace, _, path = path.rpartition(settings.URI_NAMESPACE_SEPARATOR)
-        path, _, ext = path.partition(settings.URI_EXT_SEPARATOR)
+        _path, _, ext = path.rpartition(settings.URI_EXT_SEPARATOR)
+        if '/' in ext:
+            ext = ''
+        else:
+            path = _path
+
+        if not path and ext:
+            path, ext = ext, ''
 
         return cls._render(
             scheme or 'i18n',
