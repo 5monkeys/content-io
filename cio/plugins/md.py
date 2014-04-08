@@ -9,4 +9,5 @@ class MarkdownPlugin(TextPlugin):
         # TODO: Handle markdown import error
         import markdown
         if data:
-            return markdown.markdown(data)
+            extensions = self.settings.get('EXTENSIONS', [])
+            return markdown.markdown(data, extensions=extensions)
