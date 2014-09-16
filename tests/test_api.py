@@ -1,4 +1,5 @@
 import cio
+import six
 from cio.backends import cache
 from cio.pipeline import pipeline
 from cio.backends import storage
@@ -205,14 +206,14 @@ class ApiTest(BaseTest):
     def test_non_distinct_uri(self):
         node1 = cio.get('page/title', u'Title1')
         node2 = cio.get('page/title', u'Title2')
-        self.assertEqual(unicode(node1), u'Title1')
-        self.assertEqual(unicode(node2), u'Title1')
+        self.assertEqual(six.text_type(node1), u'Title1')
+        self.assertEqual(six.text_type(node2), u'Title1')
 
         node1 = cio.get('page/title', u'Title1', lazy=False)
         cache.clear()
         node2 = cio.get('page/title', u'Title2', lazy=False)
-        self.assertEqual(unicode(node1), u'Title1')
-        self.assertEqual(unicode(node2), u'Title2')  # Second node not buffered, therefore unique default content
+        self.assertEqual(six.text_type(node1), u'Title1')
+        self.assertEqual(six.text_type(node2), u'Title2')  # Second node not buffered, therefore unique default content
 
     def test_fallback(self):
         with cio.env(i18n=('sv-se', 'en-us', 'en-uk')):
@@ -294,18 +295,18 @@ class ApiTest(BaseTest):
             # with self.assertDB(calls=2), self.assertCache(calls=5, hits=1, misses=2, sets=2):
             with self.assertDB(calls=4, selects=4):
                 with self.assertCache(calls=2, hits=1, misses=2, sets=2):
-                    self.assertEqual(unicode(node1), u'epost')
+                    self.assertEqual(six.text_type(node1), u'epost')
                     self.assertEqual(node2.content, u'surname')
-                    self.assertEqual(unicode(node3), u'postnummer')
+                    self.assertEqual(six.text_type(node3), u'postnummer')
 
             with self.assertDB(calls=0):
                 with self.assertCache(calls=1, hits=3):
                     node1 = cio.get('label/email')
                     node2 = cio.get('i18n://label/surname')
                     node3 = cio.get('i18n://monkey@label/zipcode', default=u'postnummer')
-                    self.assertEqual(unicode(node1), u'epost')
+                    self.assertEqual(six.text_type(node1), u'epost')
                     self.assertEqual(node2.content, u'surname')
-                    self.assertEqual(unicode(node3), u'postnummer')
+                    self.assertEqual(six.text_type(node3), u'postnummer')
 
             self.assertIsNotNone(repr(node1))
             self.assertIsNotNone(str(node1))
@@ -316,7 +317,7 @@ class ApiTest(BaseTest):
 
         node = cio.set('i18n://sv-se@empty.txt', u'')
         node = cio.get(node.uri, default=u'fallback')
-        self.assertEqual(unicode(node), u'')
+        self.assertEqual(six.text_type(node), u'')
 
     def test_load_pipeline(self):
         with self.assertRaises(ImportError):

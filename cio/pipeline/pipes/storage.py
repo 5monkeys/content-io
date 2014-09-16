@@ -1,3 +1,4 @@
+import six
 from .base import BasePipe
 from ...conf import settings
 from ...backends import storage
@@ -10,7 +11,7 @@ class StoragePipe(BasePipe):
         response = {}
         stored_nodes = storage.get_many(request.keys())
 
-        for uri, stored_node in stored_nodes.iteritems():
+        for uri, stored_node in six.iteritems(stored_nodes):
             node = response[node.uri] = request.pop(uri)
             self.materialize_node(node, **stored_node)
 
@@ -35,7 +36,7 @@ class StoragePipe(BasePipe):
     def delete_request(self, request):
         deleted_nodes = storage.delete_many(request.keys())
 
-        for uri, deleted_node in deleted_nodes.iteritems():
+        for uri, deleted_node in six.iteritems(deleted_nodes):
             node = request[uri]
             deleted_node['content'] = None  # Set content to None to signal node has been deleted
             self.materialize_node(node, **deleted_node)
@@ -58,7 +59,7 @@ class NamespaceFallbackPipe(BasePipe):
         fallback_uris = {}
 
         # Build fallback URI map
-        for uri, node in request.iteritems():
+        for uri, node in six.iteritems(request):
             # if node.uri != node.initial_uri:
             namespaces = getattr(node.env, uri.scheme)[1:]
             if namespaces:
@@ -67,17 +68,17 @@ class NamespaceFallbackPipe(BasePipe):
 
         # Fetch nodes from storage, each fallback level slice at a time
         while fallback_uris:
-            level_uris = dict((fallback.pop(0), uri) for uri, fallback in fallback_uris.iteritems())
+            level_uris = dict((fallback.pop(0), uri) for uri, fallback in six.iteritems(fallback_uris))
             stored_nodes = storage.get_many(level_uris.keys())
 
             # Set node fallback content and add to response
-            for uri, stored_node in stored_nodes.iteritems():
+            for uri, stored_node in six.iteritems(stored_nodes):
                 requested_uri = level_uris[uri]
                 node = response[node.uri] = request.pop(requested_uri)
                 self.materialize_node(node, **stored_node)
 
             # Remove exhausted uris that has run out of fallback namespaces
-            for uri, fallback in fallback_uris.items():
+            for uri, fallback in list(fallback_uris.items()):
                 if not fallback:
                     fallback_uris.pop(uri)
 

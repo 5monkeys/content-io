@@ -1,3 +1,4 @@
+import six
 from ..base import CacheBackend
 
 
@@ -43,7 +44,7 @@ class LocMemCacheBackend(CacheBackend):
         self.sets += 1
 
     def _set_many(self, data):
-        for key, value in data.iteritems():
+        for key, value in six.iteritems(data):
             self._cache[key] = value
             self.sets += 1
         self.calls += 1

@@ -1,3 +1,4 @@
+import six
 from .exceptions import UnknownPlugin
 from ..conf import settings
 from ..utils.imports import import_class
@@ -11,7 +12,7 @@ class PluginLibrary(object):
         settings.watch(self.load)
 
     def __iter__(self):
-        return self.plugins.iterkeys()
+        return six.iterkeys(self.plugins)
 
     @property
     def plugins(self):
@@ -25,7 +26,7 @@ class PluginLibrary(object):
             self.register(plugin_path)
 
     def register(self, plugin):
-        if isinstance(plugin, basestring):
+        if isinstance(plugin, six.string_types):
             try:
                 plugin_class = import_class(plugin)
                 self.register(plugin_class)

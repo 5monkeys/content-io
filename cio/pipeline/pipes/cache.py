@@ -1,3 +1,4 @@
+import six
 from .base import BasePipe
 from ...backends import cache
 
@@ -8,12 +9,12 @@ class CachePipe(BasePipe):
         response = {}
 
         # Only get nodes from cache without specified version
-        uris = tuple(uri for uri, node in request.iteritems() if not node.uri.version)
+        uris = tuple(uri for uri, node in six.iteritems(request) if not node.uri.version)
 
         if uris:
             cached_nodes = cache.get_many(uris)
 
-            for uri, cached_node in cached_nodes.iteritems():
+            for uri, cached_node in six.iteritems(cached_nodes):
                 node = response[node.uri] = request.pop(uri)
                 self.materialize_node(node, **cached_node)
 
@@ -23,7 +24,7 @@ class CachePipe(BasePipe):
         nodes = {}
 
         # Cache nodes without specified version (i.e. default or published)
-        for uri, node in response.iteritems():
+        for uri, node in six.iteritems(response):
             if not uri.version:
                 origin_uri = node.uri.clone(namespace=uri.namespace)
                 nodes[origin_uri] = node.content
@@ -36,7 +37,7 @@ class CachePipe(BasePipe):
         return response
 
     def publish_response(self, response):
-        nodes = dict((node.uri, node.content) for uri, node in response.iteritems())
+        nodes = dict((node.uri, node.content) for uri, node in six.iteritems(response))
         cache.set_many(nodes)
         return response
 

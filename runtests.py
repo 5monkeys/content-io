@@ -2,7 +2,12 @@
 import logging
 import os
 import sys
-from unittest2 import defaultTestLoader as TestLoader, TestSuite, TextTestRunner as TestRunner
+import six
+
+if six.PY3:
+    from unittest import defaultTestLoader as TestLoader, TestSuite, TextTestRunner as TestRunner
+else:
+    from unittest2 import defaultTestLoader as TestLoader, TestSuite, TextTestRunner as TestRunner
 
 
 def main():

@@ -1,5 +1,5 @@
+import six
 import sqlite3
-from itertools import izip
 from sqlite3 import IntegrityError
 from ..exceptions import NodeDoesNotExist, PersistenceError
 from ...backends.base import DatabaseBackend
@@ -117,7 +117,7 @@ class SqliteBackend(DatabaseBackend):
         if node is None:
             raise NodeDoesNotExist('Node for uri "%s" does not exist' % uri)
         else:
-            return dict((c, v) for c, v in izip(columns, node))
+            return dict((c, v) for c, v in six.moves.zip(columns, node))
 
     def _create(self, uri, content, **meta):
         node = {

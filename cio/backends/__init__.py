@@ -1,4 +1,5 @@
 import inspect
+import six
 from .base import BaseBackend, CacheBackend, StorageBackend
 from .exceptions import InvalidBackend
 from ..conf import settings
@@ -128,7 +129,7 @@ class CacheManager(BackendManager, CacheBackend):
         self.backend.set(uri, content)
 
     def set_many(self, nodes):
-        nodes = dict((self._clean_set_uri(uri), content) for uri, content in nodes.iteritems())
+        nodes = dict((self._clean_set_uri(uri), content) for uri, content in six.iteritems(nodes))
         self.backend.set_many(nodes)
 
     def delete(self, uri):

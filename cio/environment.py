@@ -1,3 +1,4 @@
+import six
 from collections import namedtuple
 from contextlib import contextmanager
 from .conf import settings
@@ -34,6 +35,8 @@ class Environment(ThreadLocalObject):
     def _ensure_tuple(self, ns):
         if isinstance(ns, tuple):
             return ns
+        elif isinstance(ns, six.string_types):
+            return ns,
         elif hasattr(ns, '__iter__'):
             return tuple(ns)
         else:
