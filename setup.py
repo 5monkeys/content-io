@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from setuptools import setup, find_packages
-import six
+from sys import version_info
 
 tests_require = [
     'six',
@@ -8,7 +8,7 @@ tests_require = [
     'Markdown'
 ]
 
-if six.PY2:
+if version_info < (3,):
     tests_require += ['unittest2']
 
 version = __import__('cio').__version__
