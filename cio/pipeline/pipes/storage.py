@@ -42,7 +42,7 @@ class StoragePipe(BasePipe):
             self.materialize_node(node, **deleted_node)
 
     def publish_request(self, request):
-        for uri, node in request.items():
+        for uri, node in list(request.items()):
             try:
                 published_node = storage.publish(uri, **node.meta)
             except NodeDoesNotExist:
