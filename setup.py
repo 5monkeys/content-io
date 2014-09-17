@@ -2,8 +2,11 @@
 from setuptools import setup, find_packages
 from sys import version_info
 
-tests_require = [
+install_requires = [
     'six',
+]
+
+tests_require = [
     'coverage',
     'Markdown'
 ]
@@ -48,6 +51,7 @@ setup(
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
+    install_requires=install_requires,
     extras_require={
         'tests': tests_require,
     },
