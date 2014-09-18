@@ -19,14 +19,19 @@ class Node(object):
     def __repr__(self):
         return u'<Node: %s>' % self.uri
 
-    def __str__(self):
+    def __bytes__(self):
         content = self.render()
-        if six.PY2 and isinstance(content, six.text_type):
+        if isinstance(content, six.text_type):
             content = content.encode('utf-8')
-        return content or ''
+        return content or b''
 
     def __unicode__(self):
         return self.render() or u''
+
+    if six.PY2:
+        __str__ = __bytes__
+    else:
+        __str__ = __unicode__
 
     def render(self, **context):
         if self.content is not None:
