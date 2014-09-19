@@ -1,4 +1,7 @@
+from __future__ import unicode_literals
+
 import logging
+
 from .txt import TextPlugin
 from .. import PY26
 

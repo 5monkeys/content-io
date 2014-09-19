@@ -1,3 +1,6 @@
+# coding=utf-8
+from __future__ import unicode_literals
+
 import json
 import logging
 import six
@@ -326,4 +329,4 @@ class DatabaseBackend(StorageBackend):
         for v in revisions:
             if v.isdigit():
                 versions.append(int(v))
-        return str(sorted(versions)[-1] + 1)
+        return six.text_type(sorted(versions)[-1] + 1)

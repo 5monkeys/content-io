@@ -1,3 +1,6 @@
+# coding=utf-8
+from __future__ import unicode_literals
+
 import inspect
 import six
 from .base import BaseBackend, CacheBackend, StorageBackend

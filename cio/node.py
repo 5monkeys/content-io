@@ -1,3 +1,6 @@
+# coding=utf-8
+from __future__ import unicode_literals
+
 from .environment import env
 from .utils.formatters import ContentFormatter
 from .utils.uri import URI
@@ -17,7 +20,7 @@ class Node(object):
         self.meta = meta
 
     def __repr__(self):
-        return u'<Node: %s>' % self.uri
+        return '<Node: %s>' % self.uri
 
     def __bytes__(self):
         content = self.render()
@@ -26,12 +29,9 @@ class Node(object):
         return content or b''
 
     def __unicode__(self):
-        return self.render() or u''
+        return self.render() or ''
 
-    if six.PY2:
-        __str__ = __bytes__
-    else:
-        __str__ = __unicode__
+    __str__ = __bytes__ if six.PY2 else __unicode__
 
     def render(self, **context):
         if self.content is not None:
@@ -68,7 +68,7 @@ class Node(object):
 
     def for_json(self):
         return {
-            'uri': str(self.uri),
+            'uri': six.text_type(self.uri),
             'content': self.content,
             'meta': self.meta if self.meta is not None else {}
         }
