@@ -1,5 +1,7 @@
+import json
 from unittest2 import TestCase
 from contextlib import contextmanager
+from cio.plugins.base import BasePlugin
 
 
 class BaseTest(TestCase):
@@ -28,6 +30,10 @@ class BaseTest(TestCase):
                     'g11n': 'global'
                 }
             },
+            PLUGINS=[
+                'cio.plugins.txt.TextPlugin',
+                'cio.plugins.md.MarkdownPlugin'
+            ]
         )
 
     def assertKeys(self, dict, *keys):
@@ -77,3 +83,24 @@ class BaseTest(TestCase):
             assert count('DELETE') == deletes
 
         backend.stop_debug()
+
+
+class UppercasePlugin(BasePlugin):
+
+    ext = 'up'
+
+    def load(self, content):
+        try:
+            return json.loads(content) if content else None
+        except ValueError:
+            return content
+
+    def save(self, data):
+        if isinstance(data, dict):
+            return json.dumps(data)
+        else:
+            return json.dumps(dict(name=data))
+
+    def render(self, data):
+        name = data if isinstance(data, basestring) else data['name']
+        return name.upper()

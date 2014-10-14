@@ -9,6 +9,18 @@ from tests import BaseTest
 
 class ApiTest(BaseTest):
 
+    def setUp(self):
+        super(ApiTest, self).setUp()
+
+        from cio.conf import settings
+        settings.configure(
+            PLUGINS=[
+                'cio.plugins.txt.TextPlugin',
+                'cio.plugins.md.MarkdownPlugin',
+                'tests.UppercasePlugin'
+            ]
+        )
+
     def test_get(self):
         node = cio.get('label/email', default=u'fallback')
         self.assertEqual(node.content, u'fallback')
@@ -39,15 +51,15 @@ class ApiTest(BaseTest):
         with self.assertRaises(URI.Invalid):
             cio.set('page/title.txt', 'fail')
 
-        node = cio.set('i18n://sv-se@label/email.md', u'e-post')
-        self.assertEqual(node.uri, 'i18n://sv-se@label/email.md#1')
+        node = cio.set('i18n://sv-se@label/email.up', u'e-post')
+        self.assertEqual(node.uri, 'i18n://sv-se@label/email.up#1')
         cache.clear()
         node = cio.get('label/email', u'fallback')
-        self.assertEqual(node.content, u'<p>e-post</p>')
-        self.assertEqual(node.uri, 'i18n://sv-se@label/email.md#1')
+        self.assertEqual(node.content, u'E-POST')
+        self.assertEqual(node.uri, 'i18n://sv-se@label/email.up#1')
         self.assertEqual(node.initial, u'fallback')
         self.assertEqual(len(node.meta.keys()), 0)  # No meta returned from non-versioned api get
-        self.assertEqual(repr(node._node), '<Node: i18n://sv-se@label/email.md#1>')
+        self.assertEqual(repr(node._node), '<Node: i18n://sv-se@label/email.up#1>')
         self.assertEqual(node.for_json(), {
             'uri': node.uri,
             'content': node.content,
@@ -120,38 +132,38 @@ class ApiTest(BaseTest):
         # Second draft
         with self.assertDB(selects=1, inserts=1, updates=0):
             with self.assertCache(calls=0):
-                node = cio.set('i18n://sv-se@page/title.md', u'# Content-IO - Fast!', publish=False)
-                self.assertEqual(node.uri, 'i18n://sv-se@page/title.md#draft')
+                node = cio.set('i18n://sv-se@page/title.up', u'Content-IO - Fast!', publish=False)
+                self.assertEqual(node.uri, 'i18n://sv-se@page/title.up#draft')
 
-        assertRevisions(('i18n://sv-se@page/title.txt#1', True), ('i18n://sv-se@page/title.md#draft', False))
+        assertRevisions(('i18n://sv-se@page/title.txt#1', True), ('i18n://sv-se@page/title.up#draft', False))
         self.assertEqual(cio.get('page/title').content, u'Content-IO')
 
         # Publish second draft, version 2
         with self.assertDB(calls=4, selects=2, updates=2):
             with self.assertCache(calls=1, sets=1):
                 node = cio.publish(node.uri)
-                self.assertEqual(node.uri, 'i18n://sv-se@page/title.md#2')
+                self.assertEqual(node.uri, 'i18n://sv-se@page/title.up#2')
 
-        assertRevisions(('i18n://sv-se@page/title.txt#1', False), ('i18n://sv-se@page/title.md#2', True))
-        self.assertEqual(cio.get('page/title').content, u'<h1>Content-IO - Fast!</h1>')
+        assertRevisions(('i18n://sv-se@page/title.txt#1', False), ('i18n://sv-se@page/title.up#2', True))
+        self.assertEqual(cio.get('page/title').content, u'CONTENT-IO - FAST!')
 
         # Alter published version 2
         with self.assertDB(calls=2, selects=1, inserts=0, updates=1):
             with self.assertCache(calls=0):
-                node = cio.set('i18n://sv-se@page/title.md#2', u'# Content-IO - Lightening fast!', publish=False)
-                self.assertEqual(node.uri, 'i18n://sv-se@page/title.md#2')
+                node = cio.set('i18n://sv-se@page/title.up#2', u'Content-IO - Lightening fast!', publish=False)
+                self.assertEqual(node.uri, 'i18n://sv-se@page/title.up#2')
 
-        assertRevisions(('i18n://sv-se@page/title.txt#1', False), ('i18n://sv-se@page/title.md#2', True))
-        self.assertEqual(cio.get('page/title').content, u'<h1>Content-IO - Fast!</h1>')  # Not published, still in cache
+        assertRevisions(('i18n://sv-se@page/title.txt#1', False), ('i18n://sv-se@page/title.up#2', True))
+        self.assertEqual(cio.get('page/title').content, u'CONTENT-IO - FAST!')  # Not published, still in cache
 
         # Re-publish version 2, no change
         with self.assertDB(selects=1, inserts=0, updates=0):
             with self.assertCache(calls=1, sets=1):
                 node = cio.publish(node.uri)
-                self.assertEqual(node.uri, 'i18n://sv-se@page/title.md#2')
+                self.assertEqual(node.uri, 'i18n://sv-se@page/title.up#2')
 
-        assertRevisions(('i18n://sv-se@page/title.txt#1', False), ('i18n://sv-se@page/title.md#2', True))
-        self.assertEqual(cio.get('page/title').content, u'<h1>Content-IO - Lightening fast!</h1>')
+        assertRevisions(('i18n://sv-se@page/title.txt#1', False), ('i18n://sv-se@page/title.up#2', True))
+        self.assertEqual(cio.get('page/title').content, u'CONTENT-IO - LIGHTENING FAST!')
 
         # Rollback version 1
         with self.assertDB(calls=3, selects=1, updates=2):
@@ -159,13 +171,13 @@ class ApiTest(BaseTest):
                 node = cio.publish('i18n://sv-se@page/title#1')
                 self.assertEqual(node.uri, 'i18n://sv-se@page/title.txt#1')
 
-        assertRevisions(('i18n://sv-se@page/title.txt#1', True), ('i18n://sv-se@page/title.md#2', False))
+        assertRevisions(('i18n://sv-se@page/title.txt#1', True), ('i18n://sv-se@page/title.up#2', False))
         self.assertEqual(cio.get('page/title').content, u'Content-IO')
 
         # Assert get specific version doesn't mess up the cache
         cache.clear()
         with self.assertCache(calls=0):
-            self.assertEqual(cio.get('page/title#2').content, u'<h1>Content-IO - Lightening fast!</h1>')
+            self.assertEqual(cio.get('page/title#2').content, u'CONTENT-IO - LIGHTENING FAST!')
         with self.assertCache(calls=2, misses=1, sets=1):
             self.assertEqual(cio.get('page/title').content, u'Content-IO')
 
@@ -174,8 +186,8 @@ class ApiTest(BaseTest):
         self.assertEqual(data['uri'], 'i18n://sv-se@page/title.txt#1')
         self.assertEqual(data['data'], u'Content-IO')
         data = cio.load('sv-se@page/title#2')
-        self.assertEqual(data['uri'], 'i18n://sv-se@page/title.md#2')
-        self.assertEqual(data['data'], u'# Content-IO - Lightening fast!')
+        self.assertEqual(data['uri'], 'i18n://sv-se@page/title.up#2')
+        self.assertEqual(data['data'], {u'name': u'Content-IO - Lightening fast!'})
 
         # Load without version and expect published version
         data = cio.load('sv-se@page/title')
@@ -204,15 +216,15 @@ class ApiTest(BaseTest):
 
     def test_fallback(self):
         with cio.env(i18n=('sv-se', 'en-us', 'en-uk')):
-            node1 = cio.set('i18n://bogus@label/email.txt', u'epost')
-            node2 = cio.set('i18n://en-uk@label/surname.txt', u'surname')
+            cio.set('i18n://bogus@label/email.txt', u'epost')
+            cio.set('i18n://en-uk@label/surname.txt', u'surname')
 
             with self.assertCache(misses=2, sets=2):
                 with self.assertDB(calls=6, selects=6):
-                    node3 = cio.get('i18n://label/email')
-                    node4 = cio.get('i18n://label/surname', u'efternamn')
-                    self.assertIsNone(node3.content)
-                    self.assertEqual(node4.content, u'surname')
+                    node1 = cio.get('i18n://label/email')
+                    node2 = cio.get('i18n://label/surname', u'efternamn')
+                    self.assertIsNone(node1.content)
+                    self.assertEqual(node2.content, u'surname')
 
             cache.clear()
 
@@ -228,16 +240,16 @@ class ApiTest(BaseTest):
         self.assertEqual(node.uri, 'i18n://sv-se@page/title.txt#1')
         self.assertEqual(node.content, u'Title')
 
-        node = cio.get('i18n://sv-se@page/title.md', u'# Default Markdown', lazy=False)
-        self.assertEqual(node.uri, 'i18n://sv-se@page/title.md')
-        self.assertEqual(node.content, u'<h1>Default Markdown</h1>')  # Cache still contains 'Title', but plugin diff and skipped
+        node = cio.get('i18n://sv-se@page/title.up', u'Default Upper', lazy=False)
+        self.assertEqual(node.uri, 'i18n://sv-se@page/title.up')
+        self.assertEqual(node.content, u'DEFAULT UPPER')  # Cache still contains 'Title', but plugin diff and skipped
         cached_node = cache.get(node.uri)
-        self.assertDictEqual(cached_node, {'uri': node.uri, 'content': u'<h1>Default Markdown</h1>'})
+        self.assertDictEqual(cached_node, {'uri': node.uri, 'content': u'DEFAULT UPPER'})
 
         cache.clear()
-        node = cio.get('i18n://sv-se@page/title.md', u'Default Markdown', lazy=False)
-        self.assertEqual(node.uri, 'i18n://sv-se@page/title.md')
-        self.assertEqual(node.content, u'<p>Default Markdown</p>')  # Cache cleared, storage plugin mismatch, default fallback
+        node = cio.get('i18n://sv-se@page/title.up', u'Default-Upper', lazy=False)
+        self.assertEqual(node.uri, 'i18n://sv-se@page/title.up')
+        self.assertEqual(node.content, u'DEFAULT-UPPER')  # Cache cleared, storage plugin mismatch, default fallback
 
     def test_node_meta(self):
         node = cio.set('sv-se@page/title', u'', author=u'lundberg')

@@ -1,9 +1,7 @@
-import json
 import cio
 from cio.conf import settings
 from cio.plugins import plugins
 from cio.backends import storage
-from cio.plugins.base import BasePlugin
 from cio.plugins.exceptions import UnknownPlugin
 from cio.plugins.txt import TextPlugin
 from tests import BaseTest
@@ -33,7 +31,7 @@ class PluginTest(BaseTest):
         settings.configure(PLUGINS=[
             'cio.plugins.txt.TextPlugin',
             'cio.plugins.md.MarkdownPlugin',
-            'tests.test_plugins.UppercasePlugin'
+            'tests.UppercasePlugin'
         ])
 
         self.assertSetEqual(set(plugins.plugins.keys()), set(['txt', 'md', 'up']))
@@ -53,17 +51,3 @@ class PluginTest(BaseTest):
         self.assertEqual(node.uri.ext, 'up')
 
         self.assertSetEqual(set(p for p in plugins), set(('txt', 'md', 'up')))
-
-
-class UppercasePlugin(BasePlugin):
-
-    ext = 'up'
-
-    def load(self, content):
-        return json.loads(content) if content else None
-
-    def save(self, data):
-        return json.dumps(data)
-
-    def render(self, data):
-        return data['name'].upper()
