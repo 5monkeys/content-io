@@ -27,6 +27,11 @@ class ApiTest(BaseTest):
         node = cio.get('page/body', default=None, lazy=False)
         self.assertIsNone(node.content)
 
+    def test_get_with_context(self):
+        node = cio.get('page/title', default=u'{Welcome} {firstname} {lastname}!')
+        content = node.render(firstname=u'Jonas', lastname=u'Lundberg')
+        self.assertEqual(content, u'{Welcome} Jonas Lundberg!')
+
     def test_set(self):
         with self.assertRaises(URI.Invalid):
             cio.set('page/title', 'fail')

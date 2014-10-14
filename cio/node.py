@@ -1,10 +1,13 @@
 from .environment import env
+from .utils.formatters import ContentFormatter
 from .utils.uri import URI
 
 empty = object()
 
 
 class Node(object):
+
+    _formatter = ContentFormatter()
 
     def __init__(self, uri, content=None, **meta):
         self.env = env.state
@@ -27,7 +30,7 @@ class Node(object):
     def render(self, **context):
         if self.content is not None:
             if context:
-                return self.content.format(**context)
+                return self._formatter.format(self.content, **context)
             else:
                 return self.content
 

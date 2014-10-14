@@ -1,4 +1,5 @@
 # coding=utf-8
+from cio.utils.formatters import ContentFormatter
 from cio.utils.uri import URI
 from tests import BaseTest
 
@@ -43,3 +44,18 @@ class UtilsTest(BaseTest):
         uri = URI('i18n://sv@page/title.txt#draft')
         self.assertEqual(uri, 'i18n://sv@page/title.txt#draft')
         self.assertEqual(uri.version, 'draft')
+
+    def test_formatter(self):
+        tests = [
+            (u"These are no variables: {} {0} {x} {x:f} {x!s} {x!r:.2f} { y } {{ y }}", {}, None),
+            (u"This is no variable {\n\t'foo!': 'bar', ham: 'spam'\n}", {}, None),
+            (u"These are variabls {v}, {n!s}, {n:.2f}, {n!s:>5}", dict(v=u'VALUE', n=1),
+             u"These are variabls VALUE, 1, 1.00,     1"),
+            (u"This is {mixed} with variables {}, {x}", dict(x=u'X'),
+             u"This is {mixed} with variables {}, X")
+        ]
+
+        formatter = ContentFormatter()
+
+        for template, context, value in tests:
+            self.assertEqual(formatter.format(template, **context), value or template)
