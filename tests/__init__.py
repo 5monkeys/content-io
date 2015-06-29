@@ -108,5 +108,5 @@ class UppercasePlugin(BasePlugin):
             return json.dumps(dict(name=data))
 
     def render(self, data):
-        name = data if isinstance(data, basestring) else data['name']
+        name = data if isinstance(data, six.string_types) else data['name']
         return name.upper()

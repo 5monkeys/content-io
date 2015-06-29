@@ -1,3 +1,5 @@
+import six
+
 from string import Formatter
 from .. import PY26
 
@@ -12,7 +14,7 @@ class ContentFormatter(Formatter):
         try:
             return super(ContentFormatter, self).get_value(key, args, kwargs)
         except (IndexError, KeyError):
-            if PY26 and key == u'\0':
+            if (PY26 or six.PY3) and key == u'\0':
                 # PY26: Handle of non-indexed variable -> Turn null byte into {}
                 return type(key)(u'{}')
             else:
@@ -20,7 +22,7 @@ class ContentFormatter(Formatter):
                 return self._brace_key(key)
 
     def convert_field(self, value, conversion):
-        if conversion and isinstance(value, basestring) and value[0] == u'{' and value[-1] == u'}':
+        if conversion and isinstance(value, six.string_types) and value[0] == u'{' and value[-1] == u'}':
             # Value is wrapped with braces and therefore not a context variable -> Keep conversion as value
             return self._inject_conversion(value, conversion)
         else:
@@ -34,8 +36,9 @@ class ContentFormatter(Formatter):
             return self._inject_format_spec(value, format_spec)
 
     def parse(self, format_string):
-        if PY26:
+        if PY26 or six.PY3:
             # PY26 does not support non-indexed variables -> Place null byte for later removal
+            # PY3 does not like mixing non-indexed and indexed variables to we disable them here too.
             format_string = format_string.replace('{}', '{\0}')
 
         parsed_bits = super(ContentFormatter, self).parse(format_string)
@@ -50,7 +53,7 @@ class ContentFormatter(Formatter):
         """
         key: 'x' -> '{x}'
         """
-        if isinstance(key, (int, long)):
+        if isinstance(key, six.integer_types):
             t = str
             key = t(key)
         else:
