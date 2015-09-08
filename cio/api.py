@@ -1,3 +1,6 @@
+# coding=utf-8
+from __future__ import unicode_literals
+
 from .conf import settings
 from .environment import env
 from .node import Node, empty

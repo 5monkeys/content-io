@@ -1,12 +1,18 @@
 #!/usr/bin/env python
 from setuptools import setup, find_packages
+from sys import version_info
 
+install_requires = [
+    'six',
+]
 
 tests_require = [
-    'unittest2',
     'coverage',
     'Markdown'
 ]
+
+if version_info < (3,):
+    tests_require += ['unittest2']
 
 version = __import__('cio').__version__
 
@@ -39,9 +45,13 @@ setup(
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
+    install_requires=install_requires,
     extras_require={
         'tests': tests_require,
     },

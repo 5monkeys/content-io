@@ -1,5 +1,9 @@
+# coding=utf-8
+from __future__ import unicode_literals
+
 import json
 import logging
+import six
 from hashlib import sha1
 from .exceptions import NodeDoesNotExist
 from ..utils.uri import URI
@@ -88,6 +92,10 @@ class CacheBackend(BaseBackend):
         Build sha1 hex cache key to handle key length and whitespace to be compatible with Memcached
         """
         key = uri.clone(ext=None, version=None)
+
+        if six.PY3:
+            key = key.encode('utf-8')
+
         return sha1(key).hexdigest()
 
     def _get(self, key):
@@ -137,7 +145,7 @@ class CacheBackend(BaseBackend):
         return key, value
 
     def _prepare_nodes(self, nodes):
-        return dict(self._prepare_node(uri, content) for uri, content in nodes.iteritems())
+        return dict(self._prepare_node(uri, content) for uri, content in six.iteritems(nodes))
 
 
 class StorageBackend(BaseBackend):
@@ -304,7 +312,7 @@ class DatabaseBackend(StorageBackend):
 
         if meta:
             _meta = self._decode_meta(encoded_meta)
-            for key, value in meta.iteritems():
+            for key, value in six.iteritems(meta):
                 if value is None:
                     _meta.pop(key, None)
                 else:
@@ -321,4 +329,4 @@ class DatabaseBackend(StorageBackend):
         for v in revisions:
             if v.isdigit():
                 versions.append(int(v))
-        return str(sorted(versions)[-1] + 1)
+        return six.text_type(sorted(versions)[-1] + 1)

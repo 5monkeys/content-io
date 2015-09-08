@@ -1,8 +1,11 @@
 # coding=utf-8
+from __future__ import unicode_literals
+
 from ..conf import settings
+import six
 
 
-class URI(str):
+class URI(six.text_type):
 
     @staticmethod
     def __new__(cls, uri=None, scheme=None, namespace=None, path=None, ext=None, version=None):
@@ -53,7 +56,7 @@ class URI(str):
                     yield settings.URI_VERSION_SEPARATOR
                     yield version
 
-        uri = str.__new__(cls, ''.join(parts_gen()))
+        uri = six.text_type.__new__(cls, ''.join(parts_gen()))
         uri.scheme = scheme
         uri.namespace = namespace
         uri.path = path

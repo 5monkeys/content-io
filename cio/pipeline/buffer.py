@@ -1,3 +1,6 @@
+# coding=utf-8
+from __future__ import unicode_literals
+
 from collections import defaultdict
 from ..node import Node
 from ..utils.thread import ThreadLocalObject
@@ -11,7 +14,7 @@ class BufferedNode(Node):
         self._flushed = False
 
     def __repr__(self):
-        return u'<BufferedNode: %s>' % self.uri
+        return '<BufferedNode: %s>' % self.uri
 
     def flush(self):
         if not self._flushed:

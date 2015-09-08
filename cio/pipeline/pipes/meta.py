@@ -1,3 +1,6 @@
+# coding=utf-8
+from __future__ import unicode_literals
+
 from time import mktime
 from datetime import datetime
 from ...pipeline.pipes.base import BasePipe

@@ -1,4 +1,5 @@
 import cio
+import six
 from cio.backends import cache, storage
 from cio.backends.exceptions import NodeDoesNotExist
 from cio.utils.uri import URI
@@ -42,7 +43,7 @@ class CacheTest(BaseTest):
 
         cached_node = cache.get(self.uri)
         content = cached_node['content']
-        self.assertIsInstance(content, unicode)
+        self.assertIsInstance(content, six.text_type)
         self.assertEqual(content, u'epost')
 
         cache.set('i18n://sv-se@label/email.txt#1', u'epost')

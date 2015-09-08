@@ -1,4 +1,6 @@
 # coding=utf-8
+from __future__ import unicode_literals
+
 import sys
 
 PY26 = (sys.version_info[:2] == (2, 6))

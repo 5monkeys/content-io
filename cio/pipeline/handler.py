@@ -1,3 +1,6 @@
+# coding=utf-8
+from __future__ import unicode_literals
+
 from collections import defaultdict
 from functools import partial
 from .buffer import NodeBuffer, BufferedNode

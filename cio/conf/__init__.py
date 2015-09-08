@@ -1,4 +1,8 @@
+# coding=utf-8
+from __future__ import unicode_literals
+
 import logging
+import six
 from contextlib import contextmanager
 from types import ModuleType
 from . import default_settings
@@ -22,7 +26,7 @@ class Settings(dict):
 
     def deepcopy(self):
         copy = {}
-        for key, value in self.iteritems():
+        for key, value in six.iteritems(self):
             if isinstance(value, dict):
                 value = dict(value)
             if isinstance(value, list):
@@ -34,7 +38,7 @@ class Settings(dict):
         if isinstance(conf, ModuleType):
             conf = conf.__dict__
 
-        for setting, value in (conf or settings).iteritems():
+        for setting, value in six.iteritems(conf or settings):
             if setting.isupper():
                 self[setting] = value
 
