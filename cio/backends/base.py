@@ -200,6 +200,13 @@ class StorageBackend(BaseBackend):
         """
         raise NotImplementedError
 
+    def search(self, uri):
+        """
+        Return list of non-versioned uri matches based on uri query pattern:
+            ['i18n://sv-se@page/title.txt', ...]
+        """
+        raise NotImplementedError
+
 
 class DatabaseBackend(StorageBackend):
 

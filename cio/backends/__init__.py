@@ -196,6 +196,12 @@ class StorageManager(BackendManager, StorageBackend):
         uri = self._clean_get_uri(uri)
         return self.backend.get_revisions(uri)
 
+    def search(self, uri=None):
+        _uri = URI(uri)
+        if not uri or settings.URI_SCHEME_SEPARATOR not in uri:
+            _uri = _uri.clone(scheme=None)
+        return self.backend.search(uri=_uri)
+
     def _is_valid_backend(self, backend):
         return isinstance(backend, StorageBackend)
 
