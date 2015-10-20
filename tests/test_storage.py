@@ -130,3 +130,64 @@ class StorageTest(BaseTest):
             storage.backend._create(URI('i18n://sv-se@a.txt'), u'second')
         with self.assertRaises(PersistenceError):
             storage.backend._create(URI('i18n://sv-se@a#draft'), u'second')
+
+    def test_search(self):
+        storage.set('i18n://sv-se@foo/bar.txt#draft', u'')
+        storage.set('i18n://sv-se@foo/bar/baz.md#draft', u'')
+        storage.set('i18n://en@foo/bar/baz.md#draft', u'')
+        storage.set('i18n://en@foo/bar/baz.md#1', u'')
+        storage.set('i18n://en@ham/spam.txt#draft', u'')
+        storage.set('l10n://a@foo/bar.md#draft', u'')
+        storage.set('l10n://b@foo/bar/baz.txt#draft', u'')
+
+        uris = storage.search()
+        self.assertListEqual(uris, [
+            'i18n://en@foo/bar/baz.md',
+            'i18n://en@ham/spam.txt',
+            'i18n://sv-se@foo/bar.txt',
+            'i18n://sv-se@foo/bar/baz.md',
+            'l10n://a@foo/bar.md',
+            'l10n://b@foo/bar/baz.txt',
+        ])
+
+        uris = storage.search('i18n://')
+        self.assertListEqual(uris, [
+            'i18n://en@foo/bar/baz.md',
+            'i18n://en@ham/spam.txt',
+            'i18n://sv-se@foo/bar.txt',
+            'i18n://sv-se@foo/bar/baz.md',
+        ])
+
+        uris = storage.search('en@')
+        self.assertListEqual(uris, [
+            'i18n://en@foo/bar/baz.md',
+            'i18n://en@ham/spam.txt',
+        ])
+
+        uris = storage.search('foo/')
+        self.assertListEqual(uris, [
+            'i18n://en@foo/bar/baz.md',
+            'i18n://sv-se@foo/bar.txt',
+            'i18n://sv-se@foo/bar/baz.md',
+            'l10n://a@foo/bar.md',
+            'l10n://b@foo/bar/baz.txt',
+        ])
+
+        uris = storage.search('sv-se@foo/')
+        self.assertListEqual(uris, [
+            'i18n://sv-se@foo/bar.txt',
+            'i18n://sv-se@foo/bar/baz.md',
+        ])
+
+        uris = storage.search('i18n://foo/')
+        self.assertListEqual(uris, [
+            'i18n://en@foo/bar/baz.md',
+            'i18n://sv-se@foo/bar.txt',
+            'i18n://sv-se@foo/bar/baz.md',
+        ])
+
+        uris = storage.search('i18n://en@')
+        self.assertListEqual(uris, [
+            'i18n://en@foo/bar/baz.md',
+            'i18n://en@ham/spam.txt',
+        ])

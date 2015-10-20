@@ -195,6 +195,15 @@ class ApiTest(BaseTest):
         self.assertEqual(data['uri'], 'i18n://sv-se@page/title.txt#1')
         self.assertEqual(data['data'], u'Content-IO')
 
+    def test_search(self):
+        cio.set('i18n://sv-se@label/email.txt', u'e-post')
+        uris = cio.search()
+        self.assertEqual(len(uris), 1)
+        uris = cio.search('foo/')
+        self.assertEqual(len(uris), 0)
+        uris = cio.search('label/')
+        self.assertEqual(len(uris), 1)
+
     def test_environment_state(self):
         with cio.env(i18n='en-us'):
             node = cio.get('page/title')

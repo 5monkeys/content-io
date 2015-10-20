@@ -7,6 +7,7 @@ from sqlite3 import IntegrityError
 from ..exceptions import NodeDoesNotExist, PersistenceError
 from ...backends.base import DatabaseBackend
 from ...conf.exceptions import ImproperlyConfigured
+from ...utils.uri import URI
 
 
 class SqliteBackend(DatabaseBackend):
@@ -97,6 +98,25 @@ class SqliteBackend(DatabaseBackend):
         key = self._build_key(uri)
         nodes = self._call_select('plugin, version, is_published FROM content_io_node WHERE key=:key', key=key)
         return [(uri.clone(ext=ext, version=ver), bool(pub)) for ext, ver, pub in nodes.fetchall()]
+
+    def search(self, uri):
+        query = 'DISTINCT key, plugin FROM content_io_node'
+        where = {}
+
+        if uri.scheme:
+            where['key LIKE :scheme'] = 'scheme', uri.scheme + '%'
+        if uri.namespace:
+            where['key LIKE :namespace'] = 'namespace', '%://' + uri.namespace + '@%'
+        if uri.path:
+            where['key LIKE :path'] = 'path', '%@' + uri.path + '%'
+
+        if where:
+            query += ' WHERE ' + ' AND '.join(where.keys())
+
+        query += ' ORDER BY key, plugin'
+
+        nodes = self._call_select(query, **dict(where.values()))
+        return [URI(key).clone(ext=ext) for key, ext in nodes.fetchall()]
 
     def _get(self, uri):
         columns = ('id', 'key', 'content', 'plugin', 'version', 'is_published', 'meta')

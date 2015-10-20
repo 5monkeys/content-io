@@ -134,3 +134,7 @@ def load(uri):
         }
 
     return node
+
+
+def search(uri=None):
+    return storage.search(uri=uri)
