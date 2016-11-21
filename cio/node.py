@@ -66,6 +66,20 @@ class Node(object):
     def initial_uri(self):
         return self._uri[0]
 
+    @property
+    def namespace_uri(self):
+        """
+        Finds and returns first applied URI of this node that has a namespace.
+
+        :return str: uri
+        """
+        try:
+            return iter(
+                filter(lambda uri: URI(uri).namespace, self._uri)
+            ).next()
+        except StopIteration:
+            return None
+
     def for_json(self):
         return {
             'uri': six.text_type(self.uri),

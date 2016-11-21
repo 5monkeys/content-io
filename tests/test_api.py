@@ -233,7 +233,11 @@ class ApiTest(BaseTest):
                 with self.assertDB(calls=6, selects=6):
                     node1 = cio.get('i18n://label/email')
                     node2 = cio.get('i18n://label/surname', u'efternamn')
+                    self.assertEqual(node1.uri.namespace, 'sv-se')  # No fallback, stuck on first namespace, sv-se
+                    self.assertEqual(node1.namespace_uri.namespace, 'sv-se')
                     self.assertIsNone(node1.content)
+                    self.assertEqual(node2.uri.namespace, 'en-uk')
+                    self.assertEqual(node2.namespace_uri.namespace, 'sv-se')
                     self.assertEqual(node2.content, u'surname')
 
             cache.clear()

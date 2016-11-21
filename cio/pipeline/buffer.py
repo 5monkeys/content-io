@@ -47,6 +47,10 @@ class BufferedNode(Node):
     def initial_uri(self):
         return self._node.initial_uri
 
+    @property
+    def namespace_uri(self):
+        return self._node.namespace_uri
+
 
 class NodeBuffer(ThreadLocalObject):
 
