@@ -74,9 +74,9 @@ class Node(object):
         :return str: uri
         """
         try:
-            return iter(
-                filter(lambda uri: URI(uri).namespace, self._uri)
-            ).next()
+            return next(
+                iter(filter(lambda uri: URI(uri).namespace, self._uri))
+            )
         except StopIteration:
             return None
 
