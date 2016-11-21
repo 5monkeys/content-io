@@ -73,4 +73,5 @@ class Environment(ThreadLocalObject):
     def g11n(self):
         return self.state.g11n
 
+
 env = Environment()
