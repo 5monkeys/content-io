@@ -1,6 +1,7 @@
 import cio
 import six
 from cio.backends import cache
+from cio.conf.exceptions import ImproperlyConfigured
 from cio.pipeline import pipeline
 from cio.backends import storage
 from cio.backends.exceptions import NodeDoesNotExist
@@ -339,3 +340,7 @@ class ApiTest(BaseTest):
     def test_load_pipeline(self):
         with self.assertRaises(ImportError):
             pipeline.add_pipe('foo.Bar')
+
+    def test_unknown_plugin(self):
+        with self.assertRaises(ImproperlyConfigured):
+            cio.set('i18n://sv-se@foo/bar.baz#draft', 'raise')
