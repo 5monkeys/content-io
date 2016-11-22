@@ -81,6 +81,10 @@ class ApiTest(BaseTest):
         self.assertEqual(node.uri.ext, 'txt')
         self.assertEqual(len(node.meta.keys()), 0)
 
+        # Try publish non-existing node/uri
+        node = cio.publish('i18n://sv-se@foo/bar.txt#draft')
+        self.assertIsNone(node)
+
     def test_delete(self):
         with self.assertRaises(URI.Invalid):
             cio.delete('foo/bar')
