@@ -85,7 +85,7 @@ class CacheBackend(BaseBackend):
         """
         Removes all nodes from cache
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def _build_cache_key(self, uri):
         """
@@ -99,22 +99,22 @@ class CacheBackend(BaseBackend):
         return sha1(key).hexdigest()
 
     def _get(self, key):
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def _get_many(self, keys):
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def _set(self, key, value):
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def _set_many(self, data):
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def _delete(self, key):
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def _delete_many(self, keys):
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def _encode_content(self, uri, content):
         """
@@ -155,14 +155,14 @@ class StorageBackend(BaseBackend):
         Return node for uri or raise NodeDoesNotExist:
             {uri: x, content: y, meta: {}}
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def get_many(self, uris):
         """
         Return request uri map of found nodes as dicts:
             {requested_uri: {uri: x, content: y, meta: {}}}
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def set(self, uri, content, **meta):
         """
@@ -170,42 +170,42 @@ class StorageBackend(BaseBackend):
         Return tuple of node dict and True if created and False if updated:
             {uri: x, content: y, meta: {}}, True|False
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def delete(self, uri):
         """
         Delete node for uri and return node dict or None if not exists:
             {uri: x, content: y, meta: {}}
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def delete_many(self, uris):
         """
         Delete node for uri and return request uri map of deleted nodes as dicts:
             {requested_uri: {uri: x, content: y, meta: {}}}
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def publish(self, uri, **meta):
         """
         Return published node as dict or raise NodeDoesNotExist:
             {uri: x, content: y, meta: {}}
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def get_revisions(self, uri):
         """
         Return list of tuples with uri and published state:
             [('i18n://sv-se@page/title.txt#1', False), ('i18n://sv-se@page/title.md#2', True)]
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def search(self, uri):
         """
         Return list of non-versioned uri matches based on uri query pattern:
             ['i18n://sv-se@page/title.txt', ...]
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
 
 class DatabaseBackend(StorageBackend):
@@ -269,16 +269,16 @@ class DatabaseBackend(StorageBackend):
         return deleted_nodes
 
     def _get(self, uri):
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def _create(self, uri, content, **meta):
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def _update(self, uri, content, **meta):
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def _delete(self, node):
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def _build_key(self, uri):
         """

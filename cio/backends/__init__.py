@@ -84,19 +84,19 @@ class BackendManager(object):
         return self.__class__.__name__.rstrip('Manager').lower()
 
     def _get_backend_config(self):
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def _is_valid_backend(self, backend):
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def _clean_get_uri(self, uri):
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def _clean_set_uri(self, uri):
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def _clean_delete_uri(self, uri):
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def _clean_get_uris(self, uris):
         return tuple(self._clean_get_uri(uri) for uri in uris)
