@@ -1,6 +1,7 @@
 import cio
 from cio.conf import settings
 from cio.plugins import plugins
+from cio.plugins import md as md_module
 from cio.backends import storage
 from cio.plugins.exceptions import UnknownPlugin
 from cio.plugins.txt import TextPlugin
@@ -59,3 +60,11 @@ class PluginTest(BaseTest):
 
         plugin = plugins.get('txt')
         self.assertEqual(plugin.settings['foo'], 'bar')
+
+    def test_markdown(self):
+        markdown = plugins.get('md')
+        self.assertEqual(markdown.render('# Title'), '<h1>Title</h1>')
+
+        md_module.PY26 = True
+        self.assertEqual(markdown.render('# Title'), '# Title')
+        md_module.PY26 = cio.PY26
