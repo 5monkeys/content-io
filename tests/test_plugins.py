@@ -51,3 +51,11 @@ class PluginTest(BaseTest):
         self.assertEqual(node.uri.ext, 'up')
 
         self.assertSetEqual(set(p for p in plugins), set(('txt', 'md', 'up')))
+
+    def test_settings(self):
+        settings.configure(TXT={
+            'foo': 'bar'
+        })
+
+        plugin = plugins.get('txt')
+        self.assertEqual(plugin.settings['foo'], 'bar')
