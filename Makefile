@@ -11,7 +11,8 @@ develop:
 	python setup.py develop
 
 coverage:
-	coverage run --source cio setup.py test
+	coverage run --source cio setup.py test && \
+	coverage report
 
 clean:
 	rm -rf .tox/ dist/ *.egg *.egg-info .coverage

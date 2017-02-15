@@ -1,6 +1,8 @@
 # coding=utf-8
+from cio import lazy_shortcut
 from cio.utils.formatters import ContentFormatter
 from cio.utils.uri import URI
+from cio.utils.imports import import_class
 from tests import BaseTest
 
 
@@ -59,3 +61,14 @@ class UtilsTest(BaseTest):
 
         for template, context, value in tests:
             self.assertEqual(formatter.format(template, **context), value or template)
+
+    def test_import_class(self):
+        CF = import_class('cio.utils.formatters', 'ContentFormatter')
+        self.assertEqual(CF, ContentFormatter)
+
+        with self.assertRaises(ImportError):
+            import_class('cio.utils.formatters', 'FooBar')
+
+    def test_lazy_shortcut(self):
+        uri_module = lazy_shortcut('cio.utils', 'uri')
+        self.assertEqual(uri_module.URI, URI)

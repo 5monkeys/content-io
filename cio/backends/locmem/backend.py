@@ -59,6 +59,6 @@ class LocMemCacheBackend(CacheBackend):
 
     def _delete_many(self, keys):
         for key in keys:
-            if key in self._cache:
-                del self._cache[key]
+            self._delete(key)
+            self.calls -= 1  # Revert individual _delete call count
         self.calls += 1
