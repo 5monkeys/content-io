@@ -1,12 +1,15 @@
 # coding=utf-8
 from __future__ import unicode_literals
 
+import logging
 from collections import defaultdict
 from functools import partial
 from .buffer import NodeBuffer, BufferedNode
 from .history import NodeHistory
 from ..conf import settings
 from ..utils.imports import import_class
+
+logger = logging.getLogger(__name__)
 
 PIPELINE_CALLS = ('get', 'set', 'delete', 'publish')
 
@@ -84,9 +87,19 @@ class PipelineHandler(object):
         self._buffer.add(method, buffered_node)
         return buffered_node
 
-    def flush(self, method):
+    def flush(self, method, sender=None):
         # Extract nodes from buffer
         buffer = self._buffer.pop(method)
+
+        # Re-buffer triggering node if buffer for some reason is empty
+        if not buffer:
+            logger.warn(
+                'Tried to flush empty buffer, '
+                'triggered by probably abandoned or cached node: %r',
+                sender
+            )
+            self._buffer.add(method, sender)
+            buffer = self._buffer.pop(method)
 
         # Extract and flatten wrapped nodes, send only distinct uri's
         nodes = (buffered_nodes[0]._node for buffered_nodes in buffer.values())
@@ -94,7 +107,8 @@ class PipelineHandler(object):
         # Send nodes through pipeline
         response = self.send(method, *nodes)
 
-        # Update buffered nodes to make sure uri duplicates, not sent through pipeline, gets content
+        # Update buffered nodes to make sure uri duplicates,
+        # not sent through pipeline, gets content
         for node in response.values():
             for buffered_node in buffer[node.initial_uri]:
                 buffered_node.content = node.content

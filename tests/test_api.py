@@ -344,3 +344,18 @@ class ApiTest(BaseTest):
     def test_unknown_plugin(self):
         with self.assertRaises(ImproperlyConfigured):
             cio.set('i18n://sv-se@foo/bar.baz#draft', 'raise')
+
+    def test_abandoned_buffered_node(self):
+        cio.set('sv-se@foo/bar', u'foobar')
+
+        node = cio.get('foo/bar')
+        self.assertFalse(node._flushed)
+        self.assertIn('get', pipeline._buffer._buffer)
+
+        # Mess things up...
+        pipeline.clear()
+        self.assertFalse(node._flushed)
+        self.assertNotIn('get', pipeline._buffer._buffer)
+
+        self.assertEqual(node.content, u'foobar')
+        self.assertTrue(node._flushed)

@@ -14,11 +14,15 @@ class BufferedNode(Node):
         self._flushed = False
 
     def __repr__(self):
-        return '<BufferedNode: %s>' % self.uri
+        if self._flushed:
+            uri = self.uri
+        else:
+            uri = self._node.initial_uri
+        return '<BufferedNode: %s>' % uri
 
     def flush(self):
         if not self._flushed:
-            self._callback()
+            self._callback(self)
 
     @property
     def uri(self):
@@ -69,9 +73,14 @@ class NodeBuffer(ThreadLocalObject):
         buffer[node.initial_uri].append(node)
 
     def pop(self, method):
-        buffered_nodes = dict(self._buffer[method])
-        self._buffer[method].clear()
-        return buffered_nodes
+        buffer = self._buffer.get(method, defaultdict(list))
+
+        if buffer:
+            _clone = dict(buffer)
+            buffer.clear()
+            buffer = _clone
+
+        return buffer
 
     def clear(self):
         self._buffer.clear()
