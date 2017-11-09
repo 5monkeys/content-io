@@ -6,6 +6,7 @@ from collections import defaultdict
 from functools import partial
 from .buffer import NodeBuffer, BufferedNode
 from .history import NodeHistory
+from .. import events
 from ..conf import settings
 from ..utils.imports import import_class
 
@@ -78,6 +79,8 @@ class PipelineHandler(object):
 
         # Log response
         self.history.log(method, *response.values())
+
+        events.trigger(method, nodes)
 
         return response
 
