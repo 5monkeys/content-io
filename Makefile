@@ -27,7 +27,7 @@ develop:
 
 .PHONY: coverage
 coverage:
-	coverage run --source cio setup.py test && \
+	coverage combine || true
 	coverage report
 
 .PHONY: clean
