@@ -21,9 +21,9 @@ setup(
     version=version,
     description='Send content through a highly configurable pipeline including cache, plugin and storage pipes',
     long_description=(
-        '.. image:: https://travis-ci.org/5monkeys/content-io.png?branch=master\n'
+        '.. image:: https://travis-ci.org/5monkeys/content-io.svg?branch=master\n'
         '    :target: https://travis-ci.org/5monkeys/content-io\n'
-        '.. image:: https://coveralls.io/repos/5monkeys/content-io/badge.png?branch=master\n'
+        '.. image:: https://coveralls.io/repos/5monkeys/content-io/badge.svg?branch=master\n'
         '    :target: https://coveralls.io/r/5monkeys/content-io?branch=master\n\n'
     ),
     author='Jonas Lundberg',
@@ -48,6 +48,8 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
