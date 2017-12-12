@@ -64,7 +64,3 @@ class PluginTest(BaseTest):
     def test_markdown(self):
         markdown = plugins.get('md')
         self.assertEqual(markdown.render('# Title'), '<h1>Title</h1>')
-
-        md_module.PY26 = True
-        self.assertEqual(markdown.render('# Title'), '# Title')
-        md_module.PY26 = cio.PY26

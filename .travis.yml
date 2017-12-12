@@ -1,20 +1,45 @@
 language: python
+sudo: false
 
-python:
-  - "2.7"
-  - "3.3"
-  - "3.4"
+python: 3.5
+
+env:
+  # NOTE: On Travis web page define private STASH_URL, STASH_TOKEN, STASH_SECRET.
+  global:
+    - STASH_BOX=$TRAVIS_REPO_SLUG:$TRAVIS_BUILD_NUMBER:$STASH_SECRET
+  matrix:
+    - TOXENV=py27
+    - TOXENV=py34
+    - TOXENV=py35
+    - TOXENV=lint
+    - TOXENV=coverage
+
+matrix:
+  include:
+    - env: TOXENV=py26
+      python: 2.6
+    - env: TOXENV=py33
+      python: 3.3
+    - env: TOXENV=py36
+      python: 3.6
 
 install:
-  - if [[ "${TRAVIS_PYTHON_VERSION}" == "2.6" ]]; then pip install importlib unittest2 "markdown<=2.4"; fi
-  - pip install flake8 python-coveralls
-  - pip install -e .
-  - pip install "file://`pwd`#egg=content-io[tests]"
+  - pip install --upgrade pip
+  - pip install tox stasher
 
 script:
-  - make flake8
-  - coverage run --source cio runtests.py
-  - coverage report
+  - if [[ $TOXENV =~ coverage ]] && [ -n "$STASH_SECRET" ]; then
+    stash pull $STASH_BOX -wc $(TOXENV= tox -l | wc -l);
+    fi
+  - if [[ ! $TOXENV =~ coverage ]] || [ -n "$STASH_SECRET" ]; then
+    tox;
+    fi
+  - if [[ $TOXENV =~ py ]] && [ -n "$STASH_SECRET" ]; then
+    stash push $STASH_BOX $(ls .coverage.*);
+    fi
 
 after_success:
-  - coveralls
+  - if [[ $TOXENV =~ coverage ]]; then
+    pip install --quiet python-coveralls;
+    coveralls --ignore-errors;
+    fi
