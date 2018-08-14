@@ -1,5 +1,6 @@
 # coding=utf-8
 from cio import lazy_shortcut
+from cio.conf import settings
 from cio.utils.formatters import ContentFormatter
 from cio.utils.uri import URI
 from cio.utils.imports import import_class
@@ -39,9 +40,13 @@ class UtilsTest(BaseTest):
         self.assertEqual(uri, 'i18n://sv-se@images/me.jpg/title#draft')
         self.assertIsNone(uri.ext)
 
-        uri = URI('page/title')
+        with settings(URI_DEFAULT_SCHEME='l10n'):
+            uri = URI('page/title')
+            self.assertEqual(uri, 'l10n://page/title')
+            self.assertEqual(uri.scheme, 'l10n')
         uri = uri.clone(scheme=None)
         self.assertEqual(uri, 'page/title')
+        self.assertEqual(uri.scheme, None)
 
         uri = URI('i18n://sv@page/title.txt#draft')
         self.assertEqual(uri, 'i18n://sv@page/title.txt#draft')
