@@ -31,7 +31,7 @@ class URI(six.text_type):
             path, ext = ext, ''
 
         return cls._render(
-            scheme or 'i18n',
+            scheme or settings.URI_DEFAULT_SCHEME,
             namespace or None,
             path,
             ext or None,
