@@ -7,5 +7,6 @@
 .idea
 .DS_Store
 .tox
+.tags
 build
 dist
