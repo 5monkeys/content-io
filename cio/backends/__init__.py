@@ -29,15 +29,18 @@ def get_backend(backend):
     else:
         # Parse uri or package
         if '://' in backend:
+            config['BACKEND'] = backend
+
             scheme, _config = backend.split('://', 1)
             if scheme not in BACKENDS:
                 raise InvalidBackend('Invalid content-io backend scheme "%s"' % scheme)
-            package = backend = 'cio.backends.%s' % BACKENDS[scheme]
+            package = 'cio.backends.%s' % BACKENDS[scheme]
             class_name = 'Backend'
 
             # Parse config
             name, _, params = _config.partition('?')
-            config['NAME'] = name
+            if name:
+                config['NAME'] = name
             if params:
                 config.update(dict(param.split('=') for param in params.split('&')))
         elif '.' in backend:
@@ -77,6 +80,7 @@ class BackendManager(object):
         # Validate backend
         if self._is_valid_backend(backend):
             self._backend = backend
+            self._update_backend_settings(backend.config)
         else:
             raise InvalidBackend('Invalid content-io %s backend "%s"' % (self._scope(), self._conf))
 
@@ -84,6 +88,9 @@ class BackendManager(object):
         return self.__class__.__name__.rstrip('Manager').lower()
 
     def _get_backend_config(self):
+        raise NotImplementedError  # pragma: no cover
+
+    def _update_backend_settings(self, config):
         raise NotImplementedError  # pragma: no cover
 
     def _is_valid_backend(self, backend):
@@ -118,6 +125,9 @@ class CacheManager(BackendManager, CacheBackend):
 
     def _get_backend_config(self):
         return settings.CACHE
+
+    def _update_backend_settings(self, config):
+        settings.CACHE = config
 
     def get(self, uri):
         uri = self._clean_get_uri(uri)
@@ -163,6 +173,9 @@ class StorageManager(BackendManager, StorageBackend):
 
     def _get_backend_config(self):
         return settings.STORAGE
+
+    def _update_backend_settings(self, config):
+        settings.STORAGE = config
 
     def get(self, uri):
         uri = self._clean_get_uri(uri)
