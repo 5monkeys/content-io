@@ -22,6 +22,21 @@ class AppTest(BaseTest):
             self.assertEqual(settings.STORAGE, 'bogus.newstorage')
         self.assertEqual(settings.STORAGE, pre)
 
+        self.assertEqual(settings.STORAGE['NAME'], ':memory:', "Should've been overridden")
+
+        settings.STORAGE['PIPE'] = {'FOO': 'bar'}
+        def assert_local_thread_settings():
+            settings.configure(local=True, STORAGE={'PIPE': {'HAM': 'spam'}})
+            self.assertEqual(settings.STORAGE['PIPE']['FOO'], 'bar')
+            self.assertEqual(settings.STORAGE['PIPE']['HAM'], 'spam')
+
+        thread = threading.Thread(target=assert_local_thread_settings)
+        thread.start()
+        thread.join()
+
+        self.assertEqual(settings.STORAGE['PIPE']['FOO'], 'bar')
+        self.assertNotIn('HAM', settings.STORAGE['PIPE'])
+
     def test_environment(self):
         """
         'default': {
