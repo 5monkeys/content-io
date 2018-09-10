@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 import six
 from .base import BasePipe
+from ...conf import settings
 from ...backends import cache
 
 
@@ -34,7 +35,10 @@ class CachePipe(BasePipe):
                 # Empty node meta to be coherent with cached nodes
                 node.meta.clear()
 
-        if nodes:
+        pipe_config = settings.CACHE.get('PIPE', {})
+        cache_on_get = pipe_config.get('CACHE_ON_GET', True)
+
+        if nodes and cache_on_get:
             cache.set_many(nodes)
 
         return response

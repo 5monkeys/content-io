@@ -1,6 +1,8 @@
 import cio
 import six
+import threading
 from cio.backends import cache
+from cio.conf import settings
 from cio.conf.exceptions import ImproperlyConfigured
 from cio.pipeline import pipeline
 from cio.backends import storage
@@ -45,6 +47,28 @@ class ApiTest(BaseTest):
         node = cio.get('page/title', default=u'{Welcome} {firstname} {lastname}!')
         content = node.render(firstname=u'Jonas', lastname=u'Lundberg')
         self.assertEqual(content, u'{Welcome} Jonas Lundberg!')
+
+    def test_get_with_local_cache_pipe_settings(self):
+        def assert_local_thread():
+            settings.configure(local=True, CACHE={'PIPE': {'CACHE_ON_GET': False}})
+            self.assertIn('BACKEND', settings.CACHE, 'Cache settings should be merged')
+
+            # Test twice so that not the first get() caches the reponse in pipeline
+            with self.assertCache(calls=1, misses=1, hits=0, sets=0):
+                cio.get('local/settings', default=u'default', lazy=False)
+            with self.assertCache(calls=1, misses=1, hits=0, sets=0):
+                cio.get('local/settings', default=u'default', lazy=False)
+
+        thread = threading.Thread(target=assert_local_thread)
+        thread.start()
+        thread.join()
+
+        # Back on main thread, settings should not be affected
+        # Test twice to make sure first get chaches the reponse in pipeline
+        with self.assertCache(calls=2, misses=1, hits=0, sets=1):
+            cio.get('local/settings', default=u'default', lazy=False)
+        with self.assertCache(calls=1, misses=0, hits=1, sets=0):
+            cio.get('local/settings', default=u'default', lazy=False)
 
     def test_set(self):
         with self.assertRaises(URI.Invalid):
