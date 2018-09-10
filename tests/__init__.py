@@ -59,13 +59,13 @@ class BaseTest(TestCase):
         yield
 
         if calls >= 0:
-            assert cb.calls == calls
+            assert cb.calls == calls, '%s != %s' % (cb.calls, calls)
         if hits >= 0:
-            assert cb.hits == hits
+            assert cb.hits == hits, '%s != %s' % (cb.hits, hits)
         if misses >= 0:
-            assert cb.misses == misses
+            assert cb.misses == misses, '%s != %s' % (cb.misses, misses)
         if sets >= 0:
-            assert cb.sets == sets
+            assert cb.sets == sets, '%s != %s' % (cb.sets, sets)
 
 
     @contextmanager
@@ -78,15 +78,20 @@ class BaseTest(TestCase):
 
         count = lambda cmd: len([q for q in backend.queries if q['sql'].split(' ', 1)[0].upper().startswith(cmd)])
         if calls >= 0:
-            assert len(backend.queries) == calls
+            call_count = len(backend.queries)
+            assert call_count == calls, '%s != %s' % (call_count, calls)
         if selects >= 0:
-            assert count('SELECT') == selects
+            select_count = count('SELECT')
+            assert select_count == selects, '%s != %s' % (select_count, selects)
         if inserts >= 0:
-            assert count('INSERT') == inserts
+            insert_count = count('INSERT')
+            assert insert_count == inserts, '%s != %s' % (insert_count, inserts)
         if updates >= 0:
-            assert count('UPDATE') == updates
+            update_count = count('UPDATE')
+            assert update_count == updates, '%s != %s' % (update_count, updates)
         if deletes >= 0:
-            assert count('DELETE') == deletes
+            delete_count = count('DELETE')
+            assert delete_count == deletes, '%s != %s' % (delete_count, deletes)
 
         backend.stop_debug()
 
