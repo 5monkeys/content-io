@@ -21,27 +21,11 @@ class LocalSettings(ThreadLocalObject):
     def __contains__(self, key):
         return key in self._local
 
-    def setdefault(self, default):
-        """
-        Recursively update a dict.
-        Subdict's won't be overwritten but also updated.
-        """
-        for key, value in default.iteritems():
-            if key not in update:
-                update[key] = value
-            elif isinstance(value, dict):
-                deepupdate(value, update[key])
-        return update
-
     def get(self, var):
         return self._local[var]
 
     def set(self, **vars):
         def deepupdate(original, update):
-            """
-            Recursively update a dict.
-            Subdict's won't be overwritten but also updated.
-            """
             for key, value in original.iteritems():
                 if key not in update:
                     update[key] = value
