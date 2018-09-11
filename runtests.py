@@ -22,8 +22,8 @@ def main():
     # Configure setup
     from cio.conf import settings
     settings.configure(STORAGE={
-        'BACKEND': 'sqlite://',
-        'NAME': ':memory:',
+        'BACKEND': 'sqlite://:memory:?foo=bar',
+        'NAME': '__overridden__',
         'OPTIONS': {
             'check_same_thread': False
         }
