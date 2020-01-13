@@ -115,3 +115,17 @@ class UppercasePlugin(BasePlugin):
     def render(self, data):
         name = data if isinstance(data, six.string_types) else data['name']
         return name.upper()
+
+
+class ReplacerPlugin(BasePlugin):
+
+    ext = 'rpl'
+
+    def _load(self, node):
+        node.uri = node.uri.clone(path="page/loaded.rpl")
+        node.content = "REPLACED"
+        return self.load(node.content)
+
+    def _render(self, node, data):
+        node.uri = node.uri.clone(path="page/rendered.rpl")
+        return self.render(data)

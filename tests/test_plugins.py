@@ -53,6 +53,21 @@ class PluginTest(BaseTest):
 
         self.assertSetEqual(set(p for p in plugins), set(('txt', 'md', 'up')))
 
+    def test_replace_node_in_render_and_load(self):
+        settings.configure(PLUGINS=[
+            'cio.plugins.txt.TextPlugin',
+            'cio.plugins.md.MarkdownPlugin',
+            'tests.ReplacerPlugin'
+        ])
+
+        node = cio.set('sv-se@page/mine.rpl#1', "My own content")
+        self.assertNotEqual(node.uri.path, 'page/mine.rpl')
+        self.assertEqual(node.uri.path, 'page/rendered.rpl')
+        self.assertEqual(node.content, 'REPLACED')
+
+        node = cio.load('sv-se@page/loaded.rpl')
+        self.assertEqual(node['uri'].path, 'page/loaded')
+
     def test_settings(self):
         settings.configure(TXT={
             'foo': 'bar'
@@ -64,3 +79,6 @@ class PluginTest(BaseTest):
     def test_markdown(self):
         markdown = plugins.get('md')
         self.assertEqual(markdown.render('# Title'), '<h1>Title</h1>')
+
+    def test_markdown_handles_empty_data(self):
+        markdown = plugins.get('md')

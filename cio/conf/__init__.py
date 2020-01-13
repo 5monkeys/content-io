@@ -26,7 +26,7 @@ class LocalSettings(ThreadLocalObject):
 
     def set(self, **vars):
         def deepupdate(original, update):
-            for key, value in original.iteritems():
+            for key, value in six.iteritems(original):
                 if key not in update:
                     update[key] = value
                 elif isinstance(value, dict):

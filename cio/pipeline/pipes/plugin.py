@@ -20,8 +20,8 @@ class PluginPipe(BasePipe):
                     node.uri
                 ))
             else:
-                data = plugin.load(node.content)
-                node.content = plugin.render(data)
+                data = plugin._load(node)
+                node.content = plugin._render(node, data)
 
         return response
 
@@ -36,10 +36,20 @@ class PluginPipe(BasePipe):
                 pass
                 # TODO: Should we maybe raise here?
             else:
-                node.content = plugin.save(node.content)
+                node = plugin._save(node)
 
     def set_response(self, response):
         return self.render_response(response)
+
+    def publish_request(self, request):
+        for uri, node in list(request.items()):
+            try:
+                plugin = plugins.resolve(uri)
+            except UnknownPlugin:
+                pass
+                # TODO: Should we maybe raise here?
+            else:
+                node = plugin._publish(node)
 
     def publish_response(self, response):
         return self.render_response(response)
@@ -49,7 +59,7 @@ class PluginPipe(BasePipe):
             try:
                 plugin = plugins.resolve(node.uri)
                 if node.content is not empty:
-                    plugin.delete(node.content)
+                    plugin._delete(node)
             except UnknownPlugin:
                 pass
                 # TODO: Should we maybe raise here?

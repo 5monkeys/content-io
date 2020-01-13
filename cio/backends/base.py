@@ -284,7 +284,7 @@ class DatabaseBackend(StorageBackend):
         """
         Build node identifying key for base uri.
         """
-        return uri.clone(ext=None, version=None)
+        return uri.clone(ext=None, version=None, query=None)
 
     def _serialize(self, uri, node):
         """

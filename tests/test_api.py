@@ -383,3 +383,17 @@ class ApiTest(BaseTest):
 
         self.assertEqual(node.content, u'foobar')
         self.assertTrue(node._flushed)
+
+    def test_publish_without_version(self):
+        cio.set('i18n://sv-se@page/apa.txt', u'Bananas', publish=False)
+        node = cio.publish('i18n://sv-se@page/apa.txt')
+        self.assertEqual(node.content, 'Bananas')
+
+    def test_load_without_version(self):
+        cio.set('i18n://sv-se@page/apa.txt', u'Many bananas')
+        node = cio.load('i18n://sv-se@page/apa.txt')
+        self.assertEqual(node['content'], 'Many bananas')
+
+    def test_load_new_without_extension(self):
+        node = cio.load('i18n://sv-se@page/monkey')
+        self.assertEqual(node['content'], None)

@@ -1,11 +1,11 @@
 # coding=utf-8
+import six
 from cio import lazy_shortcut
 from cio.conf import settings
 from cio.utils.formatters import ContentFormatter
-from cio.utils.uri import URI
+from cio.utils.uri import URI, quote
 from cio.utils.imports import import_class
 from tests import BaseTest
-
 
 class UtilsTest(BaseTest):
 
@@ -51,6 +51,102 @@ class UtilsTest(BaseTest):
         uri = URI('i18n://sv@page/title.txt#draft')
         self.assertEqual(uri, 'i18n://sv@page/title.txt#draft')
         self.assertEqual(uri.version, 'draft')
+
+    def test_uri_query_params(self):
+        # Verify query params are snatched up
+        uri = URI('i18n://sv@page/title.txt?var=someval')
+        self.assertEqual(uri, 'i18n://sv@page/title.txt?var=someval')
+        self.assertDictEqual(uri.query, {
+            'var': ['someval']
+        })
+
+        # Verify query params work with version
+        uri = URI('i18n://sv@page/title.txt?var=someval#2')
+        self.assertEqual(uri, 'i18n://sv@page/title.txt?var=someval#2')
+        self.assertDictEqual(uri.query, {
+            'var': ['someval']
+        })
+
+        # Verify multiple query parameters are handled
+        uri = URI('i18n://sv@page/title.txt?var=someval&second=2')
+        self.assertEqual(uri, 'i18n://sv@page/title.txt?var=someval&second=2')
+        self.assertDictEqual(uri.query, {
+            'var': ['someval'],
+            'second': ['2'],
+        })
+
+        # Verify query params can be replaced when cloned
+        uri = uri.clone(query={
+            'var': ['newval'],
+            'second': ['1']
+        })
+        self.assertDictEqual(uri.query, {
+            'var': ['newval'],
+            'second': ['1']
+        })
+        exact_copy = uri.clone()
+        self.assertEqual(exact_copy, uri)
+        self.assertDictEqual(exact_copy.query, uri.query)
+        self.assertEqual(exact_copy.query['second'], ['1'])
+        self.assertNotEqual(id(exact_copy.query), id(uri.query))
+
+        # Verify replacement works
+        uri = URI('i18n://sv@page/title.txt?var=someval&second=2').clone(query=None)
+        self.assertEqual(uri.query, None)
+
+        # Verify unicode strings are handled correctly
+        value = quote(u'räv')
+        unicode_uri = u'i18n://sv@page/title.txt?fox=' + value
+        uri = URI(unicode_uri.encode('utf-8'))
+        self.assertEqual(uri, unicode_uri)
+        self.assertDictEqual(uri.query, {
+            u'fox': [u'räv']
+        })
+
+        # Verify query parameter order
+        uri = URI(b'i18n://sv@page/title.txt?fox=1&variable=2&last=3')
+        self.assertEqual(uri, 'i18n://sv@page/title.txt?fox=1&variable=2&last=3')
+        self.assertDictEqual(uri.query, {
+            'fox': ['1'],
+            'variable': ['2'],
+            'last': ['3']
+        })
+
+        # Verify empty variables are handled correctly
+        uri = URI(u'i18n://sv@page/title.txt?fox=&variable')
+        self.assertEqual(uri, 'i18n://sv@page/title.txt?fox=&variable=')
+        self.assertDictEqual(uri.query, {
+            'fox': [],
+            'variable': []
+        })
+
+        # Verify delimiters as values and/or keys
+        value = quote(u'i18n://sv@page/title.txt#1')
+        unicode_uri = u'i18n://sv@page/title.txt?fox=' + value
+        uri = URI(unicode_uri.encode('utf-8'))
+        self.assertEqual(uri, unicode_uri)
+        self.assertDictEqual(uri.query, {
+            'fox': [u'i18n://sv@page/title.txt#1']
+        })
+
+        # Verify multiple query params with same key return last entry
+        uri = URI('i18n://sv@page/title.txt?key=a&key=b&key=c')
+        self.assertEqual(uri, 'i18n://sv@page/title.txt?key=c')
+        self.assertDictEqual(uri.query, {
+            'key': ['c']
+        })
+
+        # Verify query string handles when no values are inputted
+        uri = URI('i18n://sv@page/title.txt?')
+        self.assertEqual(uri, 'i18n://sv@page/title.txt')
+        self.assertEqual(uri.query, None)
+
+        # Verify query string handles when keys without values are inputted
+        uri = URI('i18n://sv@page/title.txt?key')
+        self.assertEqual(uri, 'i18n://sv@page/title.txt?key=')
+        self.assertEqual(uri.query, {
+            'key': []
+        })
 
     def test_formatter(self):
         tests = [
