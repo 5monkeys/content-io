@@ -116,8 +116,8 @@ def load(uri):
     if node:
         # Load node data with related plugin
         plugin = plugins.resolve(node.uri)  # May raise UnknownPlugin and should be handled outside api
-        data = plugin._load(node)
-        node.content = plugin._render(node, data)
+        data = plugin.load_node(node)
+        node.content = plugin.render_node(node, data)
 
     else:
         # Initialize non-existing node without version

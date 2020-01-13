@@ -18,7 +18,7 @@ class BasePlugin(object):
         """
         return content
 
-    def _load(self, node):
+    def load_node(self, node):
         """
         Return plugin data and modify for raw node
         """
@@ -30,14 +30,14 @@ class BasePlugin(object):
         """
         return data
 
-    def _save(self, node):
+    def save_node(self, node):
         """
         Perform action on node, persist external plugin resources and return content string for plugin data
         """
         node.content = self.save(node.content)
         return node
 
-    def _publish(self, node):
+    def publish_node(self, node):
         """
         Perform actions on publish and return node to persist
         """
@@ -49,7 +49,7 @@ class BasePlugin(object):
         """
         pass
 
-    def _delete(self, node):
+    def delete_node(self, node):
         """
         Delete external plugin resources
         """
@@ -61,7 +61,7 @@ class BasePlugin(object):
         """
         return data
 
-    def _render(self, node, data):
+    def render_node(self, node, data):
         """
         Prepares node for render and returns rendered content
         """

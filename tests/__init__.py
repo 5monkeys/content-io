@@ -121,11 +121,11 @@ class ReplacerPlugin(BasePlugin):
 
     ext = 'rpl'
 
-    def _load(self, node):
+    def load_node(self, node):
         node.uri = node.uri.clone(path="page/loaded.rpl")
         node.content = "REPLACED"
         return self.load(node.content)
 
-    def _render(self, node, data):
+    def render_node(self, node, data):
         node.uri = node.uri.clone(path="page/rendered.rpl")
         return self.render(data)
