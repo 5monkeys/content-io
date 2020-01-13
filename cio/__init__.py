@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 import sys
 
 PY26 = (sys.version_info[:2] == (2, 6))
-VERSION = (1, 3, 0, 'beta', 1)
+VERSION = (1, 3, 0, 'beta', 2)
 
 
 def get_version(version=None):
